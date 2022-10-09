@@ -1,4 +1,4 @@
-#include "LintListener.hpp"
+#include "MethodReturnWithLexicalScopeListener.hpp"
 
 #include "fmt/format.h"
 #include "gflags/gflags.h"
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    auto listener = sclint::LintListener();
+    auto listener = sclint::MethodReturnWithLexicalScopeListener(fileName);
     antlr4::tree::ParseTreeWalker::DEFAULT.walk(&listener, parseTree);
 
     return 0;
