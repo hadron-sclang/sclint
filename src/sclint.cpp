@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
             configPath = configPath.parent_path() / ".sclint";
         }
         size_t configFileSize = 0;
-        auto configFile = readFile(configPath, configFileSize);
+        auto configFile = readFile(configPath.string(), configFileSize);
         if (!configFile)
             return -1;
         auto results = config.readJSON(std::string_view(configFile.get(), configFileSize));
