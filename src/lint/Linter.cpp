@@ -1,5 +1,6 @@
 #include "Linter.hpp"
 
+#include "Config.hpp"
 #include "detectors/MethodReturnLexicalScope.hpp"
 #include "detectors/Whitespace.hpp"
 
@@ -8,7 +9,7 @@
 
 namespace lint {
 
-Linter::Linter(const Config* config, std::string_view code): m_code(code), m_mux(config) { }
+Linter::Linter(const Config* config, std::string_view code): m_config(config), m_code(code), m_mux(config) { }
 
 bool Linter::lint() {
     antlr4::ANTLRInputStream input(m_code.data(), m_code.size());
@@ -19,8 +20,10 @@ bool Linter::lint() {
         return false;
 
     m_mux.clearDetectors();
-    m_mux.addDetector(std::make_unique<MethodReturnLexicalScope>());
     m_mux.addDetector(std::make_unique<Whitespace>(&tokens));
+
+    if (m_config->noMethodReturnWithLexicalScope)
+        m_mux.addDetector(std::make_unique<MethodReturnLexicalScope>());
 
     antlr4::tree::ParseTreeWalker::DEFAULT.walk(&m_mux, parser.root());
 

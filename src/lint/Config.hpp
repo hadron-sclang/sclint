@@ -1,6 +1,9 @@
 #ifndef SRC_LINT_CONFIG_HPP_
 #define SRC_LINT_CONFIG_HPP_
 
+#include <string_view>
+#include <string>
+
 namespace lint {
 
 // Holds the current configuration of the linter.
@@ -9,6 +12,9 @@ public:
     // Build a default configuration (SCStyle)
     Config() = default;
     ~Config() = default;
+
+    std::string readJSON(std::string_view jsonString);
+    std::string writeJSON() const;
 
     // These flags are all named for the *desired* code to pass linting.
 

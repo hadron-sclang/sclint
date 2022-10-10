@@ -25,10 +25,11 @@ public:
     const std::vector<Issue>& issues() const { return m_mux.issues(); }
 
 private:
+    const Config* m_config;
     std::string_view m_code;
     DetectorMux m_mux;
 };
 
-};
+} // namespace lint
 
 #endif // SRC_LINT_LINTER_HPP_

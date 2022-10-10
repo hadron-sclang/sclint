@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 #############
 # lint
 add_library(lint STATIC
+    Config.cpp
     Config.hpp
     detectors/Detector.cpp
     detectors/Detector.hpp
@@ -22,6 +23,7 @@ target_link_libraries(lint
 
 target_include_directories(lint PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}"
+    ${RAPIDJSON_INCLUDE_DIR}
 )
 
 if(WIN32)
