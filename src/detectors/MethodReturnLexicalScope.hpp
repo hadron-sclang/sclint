@@ -14,48 +14,44 @@ Test Code:
 
 True Positive:
 Function {
-	prTry {
-		var result, thread = thisThread;
-		var next = thread.exceptionHandler,
-		wasInProtectedFunc = Exception.inProtectedFunction;
-		thread.exceptionHandler = {|error|
-			thread.exceptionHandler = next; // pop
-			^error  // HERE
-		};
-		Exception.inProtectedFunction = true;
-		result = this.value;
-		Exception.inProtectedFunction = wasInProtectedFunc;
-		thread.exceptionHandler = next; // pop
-		^result
-	}
+    prTry {
+        var result, thread = thisThread;
+        var next = thread.exceptionHandler,
+        wasInProtectedFunc = Exception.inProtectedFunction;
+        thread.exceptionHandler = {|error|
+            thread.exceptionHandler = next; // pop
+            ^error  // HERE
+        };
+        Exception.inProtectedFunction = true;
+        result = this.value;
+        Exception.inProtectedFunction = wasInProtectedFunc;
+        thread.exceptionHandler = next; // pop
+        ^result
+    }
 }
 
 False Positive:
 Quark {
-	dependencies {
-		var deps = this.data['dependencies'] ?? {^[]};  // HERE
-		if(deps.isSequenceableCollection.not, {
-			("Invalid dependencies " + this + deps).warn;
-			^[]
-		});
-		^deps.collect({ |dep|
-			var q = Quark.parseDependency(dep, this);
-			if(q.isNil, {
-				"% not found".format(dep).warn;
-			});
-			q
-		}).select({ |it| it.notNil });
-	}
+    dependencies {
+        var deps = this.data['dependencies'] ?? {^[]};  // HERE
+        if(deps.isSequenceableCollection.not, {
+            ("Invalid dependencies " + this + deps).warn;
+            ^[]
+        });
+        ^deps.collect({ |dep|
+            var q = Quark.parseDependency(dep, this);
+            if(q.isNil, {
+                "% not found".format(dep).warn;
+            });
+            q
+        }).select({ |it| it.notNil });
+    }
 }
 */
 
 class MethodReturnLexicalScope : public Detector {
 public:
-    MethodReturnLexicalScope():
-        Detector(),
-        m_inBlockCount(0),
-        m_inNamedAssignCount(0),
-        m_inArgsCount(0) {}
+    MethodReturnLexicalScope(): Detector(), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
     virtual ~MethodReturnLexicalScope() = default;
 
     void enterBlock(sprklr::SCParser::BlockContext*) override { ++m_inBlockCount; }
@@ -66,7 +62,7 @@ public:
             return;
 
         m_issues->emplace_back(ctx->returnExpr()->start->getLine(), ctx->returnExpr()->start->getCharPositionInLine(),
-            std::string("method return in named function"));
+                               std::string("method return in named function"));
     }
 
     void enterExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext*) override { ++m_inNamedAssignCount; }
