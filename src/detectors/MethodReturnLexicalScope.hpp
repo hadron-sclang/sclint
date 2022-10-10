@@ -1,9 +1,10 @@
-#ifndef SCLINT_SRC_METHOD_RETURN_WITH_LEXICAL_SCOPE_LISTENER_HPP_
-#define SCLINT_SRC_METHOD_RETURN_WITH_LEXICAL_SCOPE_LISTENER_HPP_
+#ifndef SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#define SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+
+#include "Detector.hpp"
 
 #include "SCParserBaseListener.h"
 
-#include <iostream>
 #include <string>
 
 namespace sclint {
@@ -48,29 +49,24 @@ Quark {
 }
 */
 
-class MethodReturnWithLexicalScopeListener : public sprklr::SCParserBaseListener {
+class MethodReturnLexicalScope : public Detector {
 public:
-    MethodReturnWithLexicalScopeListener() = delete;
-    explicit MethodReturnWithLexicalScopeListener(std::string fileName):
-        sprklr::SCParserBaseListener(),
-        m_fileName(fileName),
+    MethodReturnLexicalScope():
+        Detector(),
         m_inBlockCount(0),
         m_inNamedAssignCount(0),
         m_inArgsCount(0) {}
-    virtual ~MethodReturnWithLexicalScopeListener() = default;
+    virtual ~MethodReturnLexicalScope() = default;
 
     void enterBlock(sprklr::SCParser::BlockContext*) override { ++m_inBlockCount; }
     void exitBlock(sprklr::SCParser::BlockContext*) override { --m_inBlockCount; }
 
     void enterBody(sprklr::SCParser::BodyContext* ctx) override {
-        if (m_inArgsCount > 0 || m_inBlockCount == 0 || m_inNamedAssignCount == 0)
+        if (!ctx->returnExpr() || m_inArgsCount > 0 || m_inBlockCount == 0 || m_inNamedAssignCount == 0)
             return;
 
-        if (ctx->returnExpr()) {
-            std::cerr << m_fileName << ": line "
-                      << ctx->returnExpr()->start->getLine() << " character "
-                      << ctx->returnExpr()->start->getCharPositionInLine() << std::endl;
-        }
+        m_issues->emplace_back(ctx->returnExpr()->start->getLine(), ctx->returnExpr()->start->getCharPositionInLine(),
+            std::string("method return in named function"));
     }
 
     void enterExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext*) override { ++m_inNamedAssignCount; }
@@ -100,7 +96,6 @@ public:
     void exitExprBinop(sprklr::SCParser::ExprBinopContext*) override { --m_inArgsCount; }
 
 private:
-    std::string m_fileName;
     int m_inBlockCount;
     int m_inNamedAssignCount;
     int m_inArgsCount;
@@ -108,4 +103,4 @@ private:
 
 } // namespace sclint
 
-#endif // SCLINT_SRC_METHOD_RETURN_WITH_LEXICAL_SCOPE_LISTENER_HPP_
+#endif // SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_

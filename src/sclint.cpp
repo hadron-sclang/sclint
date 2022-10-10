@@ -1,4 +1,6 @@
-#include "MethodReturnWithLexicalScopeListener.hpp"
+#include "detectors/Detector.hpp"
+#include "detectors/MethodReturnLexicalScope.hpp"
+#include "detectors/Whitespace.hpp"
 
 #include "fmt/format.h"
 #include "gflags/gflags.h"
@@ -57,8 +59,16 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    auto listener = sclint::MethodReturnWithLexicalScopeListener(fileName);
-    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&listener, parseTree);
+    sclint::DetectorMux mux;
+    mux.addDetector(std::make_unique<sclint::MethodReturnLexicalScope>());
+    mux.addDetector(std::make_unique<sclint::Whitespace>(&tokens));
+
+    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&mux, parseTree);
+
+    for (const auto& issue : mux.issues()) {
+        std::cout << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
+            issue.message);
+    }
 
     return 0;
 }

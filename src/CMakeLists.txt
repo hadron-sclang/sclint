@@ -5,7 +5,8 @@ set(CXX_EXTENSIONS OFF)
 #############
 # sclint
 add_executable(sclint
-    MethodReturnWithLexicalScopeListener.hpp
+    detectors/MethodReturnLexicalScope.hpp
+    detectors/Whitespace.hpp
     sclint.cpp
 )
 
