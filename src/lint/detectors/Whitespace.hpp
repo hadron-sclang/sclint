@@ -1,14 +1,14 @@
-#ifndef SCLINT_SRC_DETECTORS_WHITESPACE_HPP_
-#define SCLINT_SRC_DETECTORS_WHITESPACE_HPP_
+#ifndef SRC_LINT_DETECTORS_WHITESPACE_HPP_
+#define SRC_LINT_DETECTORS_WHITESPACE_HPP_
 
-#include "Detector.hpp"
+#include "detectors/Detector.hpp"
 
 #include "fmt/format.h"
 #include "SCParserBaseListener.h"
 
 #include <string>
 
-namespace sclint {
+namespace lint {
 
 class Whitespace : public Detector {
 public:
@@ -44,6 +44,6 @@ private:
     size_t m_tokenScanIndex;
 };
 
-} // namespace sclint
+} // namespace lint
 
-#endif // SRCLINT_SRC_DETECTORS_WHITESPACE_HPP_
+#endif // SRC_LINT_DETECTORS_WHITESPACE_HPP_

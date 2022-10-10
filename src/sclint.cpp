@@ -1,11 +1,8 @@
-#include "detectors/Detector.hpp"
-#include "detectors/MethodReturnLexicalScope.hpp"
-#include "detectors/Whitespace.hpp"
+#include "lint/Config.hpp"
+#include "lint/Linter.hpp"
 
 #include "fmt/format.h"
 #include "gflags/gflags.h"
-#include "SCLexer.h"
-#include "SCParser.h"
 
 #include <filesystem>
 #include <fstream>
@@ -48,24 +45,15 @@ int main(int argc, char* argv[]) {
     if (!code)
         return -1;
 
-    antlr4::ANTLRInputStream input(code.get(), codeSize);
-    sprklr::SCLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    sprklr::SCParser parser(&tokens);
-    auto parseTree = parser.root();
+    lint::Config config;
+    lint::Linter linter(&config, std::string_view(code.get(), codeSize));
 
-    if (parser.getNumberOfSyntaxErrors()) {
-        std::cerr << fmt::format("{} had {} syntax errors\n", fileName, parser.getNumberOfSyntaxErrors());
+    if (linter.lint()) {
+        std::cerr << fmt::format("{} had syntax errors\n", fileName);
         return -1;
     }
 
-    sclint::DetectorMux mux;
-    mux.addDetector(std::make_unique<sclint::MethodReturnLexicalScope>());
-    mux.addDetector(std::make_unique<sclint::Whitespace>(&tokens));
-
-    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&mux, parseTree);
-
-    for (const auto& issue : mux.issues()) {
+    for (const auto& issue : linter.issues()) {
         std::cout << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
                                  issue.message);
     }

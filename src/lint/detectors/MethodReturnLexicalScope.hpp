@@ -1,13 +1,13 @@
-#ifndef SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
-#define SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#ifndef SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#define SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
 
-#include "Detector.hpp"
+#include "detectors/Detector.hpp"
 
 #include "SCParserBaseListener.h"
 
 #include <string>
 
-namespace sclint {
+namespace lint {
 
 /*
 Test Code:
@@ -97,6 +97,6 @@ private:
     int m_inArgsCount;
 };
 
-} // namespace sclint
+} // namespace lint
 
-#endif // SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#endif // SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
