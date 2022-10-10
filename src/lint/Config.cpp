@@ -18,16 +18,22 @@ std::string Config::readJSON(std::string_view jsonString) {
     if (!document.IsObject())
         return "input JSON is not a dictionary.";
 
-    if (document.HasMember("oneNewlineAtEndOfFile")) {
-        if (!document["oneNewlineAtEndOfFile"].IsBool())
-            return "oneNewlineAtEndOfFile not a boolean value.";
-        oneNewlineAtEndOfFile = document["oneNewlineAtEndOfFile"].GetBool();
+    if (document.HasMember(kOneNewlineAtEndOfFileName)) {
+        if (!document[kOneNewlineAtEndOfFileName].IsBool())
+            return std::string(kOneNewlineAtEndOfFileName) + " not a boolean value.";
+        oneNewlineAtEndOfFile = document[kOneNewlineAtEndOfFileName].GetBool();
     }
 
-    if (document.HasMember("noMethodReturnWithLexicalScope")) {
-        if (!document["noMethodReturnWithLexicalScope"].IsBool())
-            return "noMethodReturnWithLexicalScope not a boolean value.";
-        noMethodReturnWithLexicalScope = document["noMethodReturnWithLexicalScope"].GetBool();
+    if (document.HasMember(kNoMethodReturnWithLexicalScopeName)) {
+        if (!document[kNoMethodReturnWithLexicalScopeName].IsBool())
+            return std::string(kNoMethodReturnWithLexicalScopeName) + " not a boolean value.";
+        noMethodReturnWithLexicalScope = document[kNoMethodReturnWithLexicalScopeName].GetBool();
+    }
+
+    if (document.HasMember(kNoCarriageReturnsInFile)) {
+        if (!document[kNoCarriageReturnsInFile].IsBool())
+            return std::string(kNoCarriageReturnsInFile) + " not a boolean value.";
+        noCarriageReturnsInFile = document[kNoCarriageReturnsInFile].GetBool();
     }
 
     return "";
@@ -38,8 +44,18 @@ std::string Config::writeJSON() const {
     document.SetObject();
     auto& alloc = document.GetAllocator();
 
-    document.AddMember("oneNewlineAtEndOfFile", rapidjson::Value(oneNewlineAtEndOfFile), alloc);
-    document.AddMember("noMethodReturnWithLexicalScope", rapidjson::Value(noMethodReturnWithLexicalScope), alloc);
+    rapidjson::Value oneNewlineAtEndOfFileString;
+    oneNewlineAtEndOfFileString.SetString(kOneNewlineAtEndOfFileName, alloc);
+    document.AddMember(oneNewlineAtEndOfFileString, rapidjson::Value(oneNewlineAtEndOfFile), alloc);
+
+
+    rapidjson::Value noMethodReturnWithLexicalScopeString;
+    noMethodReturnWithLexicalScopeString.SetString(kNoMethodReturnWithLexicalScopeName, alloc);
+    document.AddMember(noMethodReturnWithLexicalScopeString, rapidjson::Value(noMethodReturnWithLexicalScope), alloc);
+
+    rapidjson::Value noCarriageReturnsInFileString;
+    noCarriageReturnsInFileString.SetString(kNoCarriageReturnsInFile, alloc);
+    document.AddMember(noCarriageReturnsInFileString, rapidjson::Value(noCarriageReturnsInFile), alloc);
 
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);

@@ -61,8 +61,8 @@ public:
         if (!ctx->returnExpr() || m_inArgsCount > 0 || m_inBlockCount == 0 || m_inNamedAssignCount == 0)
             return;
 
-        m_issues->emplace_back(ctx->returnExpr()->start->getLine(), ctx->returnExpr()->start->getCharPositionInLine(),
-                               std::string("method return in named function"));
+        m_issues->emplace_back(IssueNumber::kMethodReturnInNamedFunction, ctx->returnExpr()->start->getLine(),
+                               ctx->returnExpr()->start->getCharPositionInLine());
     }
 
     void enterExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext*) override { ++m_inNamedAssignCount; }

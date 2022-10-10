@@ -22,6 +22,7 @@ public:
 
     // https://github.com/supercollider/supercollider/wiki/Code-style-guidelines#rule-use-exactly-one-newline-at-the-end-of-a-file
     bool oneNewlineAtEndOfFile = true;
+    static constexpr const char* kOneNewlineAtEndOfFileName = "oneNewlineAtEndOfFile";
 
     // https://github.com/supercollider/supercollider/wiki/Code-style-guidelines#rule-dont-end-lines-with-whitespace-characters
     bool noTrailingWhitespace = true;
@@ -54,6 +55,11 @@ public:
 
     // ** Unofficial Style Rules (default disabled) **
     bool noMethodReturnWithLexicalScope = false;
+    static constexpr const char* kNoMethodReturnWithLexicalScopeName = "noMethodReturnWithLexicalScope";
+
+    bool noCarriageReturnsInFile = false;
+    static constexpr const char* kNoCarriageReturnsInFile = "noCarriageReturnsInFile";
+
     bool noSingleLetterVariableNames = false;
 };
 

@@ -75,7 +75,6 @@ int main(int argc, char* argv[]) {
             return -1;
         }
     }
-
     if (FLAGS_printConfig) {
         std::cout << config.writeJSON() << std::endl;
         return 0;
@@ -101,7 +100,7 @@ int main(int argc, char* argv[]) {
 
     for (const auto& issue : linter.issues()) {
         std::cout << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
-                                 issue.message);
+                                 lint::kIssueTextTable[issue.issueNumber]);
     }
 
     return linter.issues().size() ? 1 : 0;

@@ -32,9 +32,8 @@ private:
     void scanWhitespaceTokens(const std::vector<antlr4::Token*>& whitespaceTokens) {
         for (auto token : whitespaceTokens) {
             if (token->getType() == sprklr::SCParser::CARRIAGE_RETURN) {
-                m_issues->emplace_back(token->getLine(), token->getCharPositionInLine(),
-                                       std::string("carriage return character '\\r' in file, "
-                                                   "some tools will report different line numbers"));
+                m_issues->emplace_back(IssueNumber::kCarriageReturnInFile, token->getLine(),
+                                       token->getCharPositionInLine());
             }
             m_tokenScanIndex = token->getTokenIndex();
         }
