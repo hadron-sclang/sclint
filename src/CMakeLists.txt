@@ -11,11 +11,11 @@ add_executable(sclint
 )
 
 if(WIN32)
-    set_property(TARGET schemac PROPERTY
+    set_property(TARGET sclint PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
     )
     # required if linking to static library
-    target_compile_definitions(schemac PUBLIC ANTLR4CPP_STATIC)
+    target_compile_definitions(sclint PUBLIC ANTLR4CPP_STATIC)
     # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
     set(ANTLR4_WITH_STATIC_CRT OFF)
 endif()
