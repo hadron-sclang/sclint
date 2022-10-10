@@ -13,10 +13,7 @@ namespace sclint {
 class Whitespace : public Detector {
 public:
     Whitespace() = delete;
-    explicit Whitespace(antlr4::CommonTokenStream* tokens):
-        Detector(),
-        m_tokens(tokens),
-        m_tokenScanIndex(0) {}
+    explicit Whitespace(antlr4::CommonTokenStream* tokens): Detector(), m_tokens(tokens), m_tokenScanIndex(0) { }
     virtual ~Whitespace() = default;
 
     void visitTerminal(antlr4::tree::TerminalNode* node) override {
@@ -36,8 +33,8 @@ private:
         for (auto token : whitespaceTokens) {
             if (token->getType() == sprklr::SCParser::CARRIAGE_RETURN) {
                 m_issues->emplace_back(token->getLine(), token->getCharPositionInLine(),
-                        std::string("carriage return character '\\r' in file, "
-                            "some tools will report different line numbers"));
+                                       std::string("carriage return character '\\r' in file, "
+                                                   "some tools will report different line numbers"));
             }
             m_tokenScanIndex = token->getTokenIndex();
         }

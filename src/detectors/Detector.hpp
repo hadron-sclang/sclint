@@ -16,7 +16,7 @@ struct Issue {
     size_t columnNumber;
     std::string message;
 
-    Issue(size_t line, size_t col, std::string msg): lineNumber(line), columnNumber(col), message(msg) {}
+    Issue(size_t line, size_t col, std::string msg): lineNumber(line), columnNumber(col), message(msg) { }
 };
 
 class Detector : public sprklr::SCParserBaseListener {
@@ -44,36 +44,26 @@ public:
 
     // SCParserListener overrides
     void enterRoot(sprklr::SCParser::RootContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterRoot(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterRoot(ctx); });
     }
     void exitRoot(sprklr::SCParser::RootContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitRoot(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitRoot(ctx); });
     }
 
     void enterTopLevelStatement(sprklr::SCParser::TopLevelStatementContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterTopLevelStatement(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->enterTopLevelStatement(ctx); });
     }
     void exitTopLevelStatement(sprklr::SCParser::TopLevelStatementContext* ctx) override {
-       std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitTopLevelStatement(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->exitTopLevelStatement(ctx); });
     }
 
     void enterClassDef(sprklr::SCParser::ClassDefContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterClassDef(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterClassDef(ctx); });
     }
     void exitClassDef(sprklr::SCParser::ClassDefContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitClassDef(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitClassDef(ctx); });
     }
 
     void enterSuperclass(sprklr::SCParser::SuperclassContext*) override { }
@@ -167,28 +157,20 @@ public:
     void exitVarDefList(sprklr::SCParser::VarDefListContext*) override { }
 
     void enterVarDef(sprklr::SCParser::VarDefContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterVarDef(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterVarDef(ctx); });
     }
     void exitVarDef(sprklr::SCParser::VarDefContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitVarDef(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitVarDef(ctx); });
     }
 
     void enterExprMsgDotNameArgs(sprklr::SCParser::ExprMsgDotNameArgsContext*) override { }
     void exitExprMsgDotNameArgs(sprklr::SCParser::ExprMsgDotNameArgsContext*) override { }
 
     void enterExprBinop(sprklr::SCParser::ExprBinopContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterExprBinop(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterExprBinop(ctx); });
     }
     void exitExprBinop(sprklr::SCParser::ExprBinopContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitExprBinop(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitExprBinop(ctx); });
     }
 
     void enterExprMsgNamePerform(sprklr::SCParser::ExprMsgNamePerformContext*) override { }
@@ -198,14 +180,12 @@ public:
     void exitExprIndexSeriesAssign(sprklr::SCParser::ExprIndexSeriesAssignContext*) override { }
 
     void enterExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterExprAssignDotName(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->enterExprAssignDotName(ctx); });
     }
     void exitExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitExprAssignDotName(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->exitExprAssignDotName(ctx); });
     }
 
     void enterExprMsgClassBlock(sprklr::SCParser::ExprMsgClassBlockContext*) override { }
@@ -239,14 +219,12 @@ public:
     void exitExprMultiAssign(sprklr::SCParser::ExprMultiAssignContext*) override { }
 
     void enterExprAssignGlobal(sprklr::SCParser::ExprAssignGlobalContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterExprAssignGlobal(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->enterExprAssignGlobal(ctx); });
     }
     void exitExprAssignGlobal(sprklr::SCParser::ExprAssignGlobalContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitExprAssignGlobal(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->exitExprAssignGlobal(ctx); });
     }
 
     void enterExprArrayRead(sprklr::SCParser::ExprArrayReadContext*) override { }
@@ -322,14 +300,11 @@ public:
     void exitExprNewEvent(sprklr::SCParser::ExprNewEventContext*) override { }
 
     void enterExprAssign(sprklr::SCParser::ExprAssignContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterExprAssign(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->enterExprAssign(ctx); });
     }
     void exitExprAssign(sprklr::SCParser::ExprAssignContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitExprAssign(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitExprAssign(ctx); });
     }
 
     void enterExprIndexSeriesAssignSuffix(sprklr::SCParser::ExprIndexSeriesAssignSuffixContext*) override { }
@@ -339,36 +314,26 @@ public:
     void exitExprMsgDotPerform(sprklr::SCParser::ExprMsgDotPerformContext*) override { }
 
     void enterBlock(sprklr::SCParser::BlockContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterBlock(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterBlock(ctx); });
     }
     void exitBlock(sprklr::SCParser::BlockContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitBlock(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitBlock(ctx); });
     }
 
     void enterBlockArgList(sprklr::SCParser::BlockArgListContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterBlockArgList(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->enterBlockArgList(ctx); });
     }
     void exitBlockArgList(sprklr::SCParser::BlockArgListContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitBlockArgList(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->exitBlockArgList(ctx); });
     }
 
     void enterBody(sprklr::SCParser::BodyContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterBody(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterBody(ctx); });
     }
     void exitBody(sprklr::SCParser::BodyContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitBody(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitBody(ctx); });
     }
 
     void enterReturnExpr(sprklr::SCParser::ReturnExprContext*) override { }
@@ -399,14 +364,11 @@ public:
     void exitArgList(sprklr::SCParser::ArgListContext*) override { }
 
     void enterKeyArgList(sprklr::SCParser::KeyArgListContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->enterKeyArgList(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [ctx](auto& detector) { detector->enterKeyArgList(ctx); });
     }
     void exitKeyArgList(sprklr::SCParser::KeyArgListContext* ctx) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) {
-            detector->exitKeyArgList(ctx);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitKeyArgList(ctx); });
     }
 
     void enterKeyArg(sprklr::SCParser::KeyArgContext*) override { }
@@ -454,9 +416,8 @@ public:
     void enterEveryRule(antlr4::ParserRuleContext*) override { }
     void exitEveryRule(antlr4::ParserRuleContext*) override { }
     void visitTerminal(antlr4::tree::TerminalNode* node) override {
-        std::for_each(m_detectors.begin(), m_detectors.end(), [node](auto& detector) {
-            detector->visitTerminal(node);
-        });
+        std::for_each(m_detectors.begin(), m_detectors.end(),
+                      [node](auto& detector) { detector->visitTerminal(node); });
     }
     void visitErrorNode(antlr4::tree::ErrorNode* /*node*/) override { }
 

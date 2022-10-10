@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     for (const auto& issue : mux.issues()) {
         std::cout << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
-            issue.message);
+                                 issue.message);
     }
 
     return 0;
