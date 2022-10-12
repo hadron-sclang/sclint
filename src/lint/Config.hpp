@@ -58,9 +58,12 @@ public:
     static constexpr const char* kNoMethodReturnWithLexicalScopeName = "noMethodReturnWithLexicalScope";
 
     bool noCarriageReturnsInFile = false;
-    static constexpr const char* kNoCarriageReturnsInFile = "noCarriageReturnsInFile";
+    static constexpr const char* kNoCarriageReturnsInFileName = "noCarriageReturnsInFile";
 
     bool noSingleLetterVariableNames = false;
+
+    bool lintTest = false;
+    static constexpr const char* kLintTestName = "lintTest";
 };
 
 } // namespace sclint

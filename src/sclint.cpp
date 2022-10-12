@@ -87,6 +87,10 @@ int main(int argc, char* argv[]) {
     }
 
     auto fileName = std::string(argv[1]);
+    if (!std::filesystem::exists(fileName)) {
+        std::cerr << fmt::format("'{}': file not found.\n", fileName);
+        return -1;
+    }
     size_t codeSize = 0;
     auto code = readFile(fileName, codeSize);
     if (!code)

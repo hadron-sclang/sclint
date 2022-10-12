@@ -4,7 +4,6 @@
 #include "detectors/Detector.hpp"
 
 #include "fmt/format.h"
-#include "SCParserBaseListener.h"
 
 #include <string>
 
@@ -20,11 +19,13 @@ public:
         auto tokenIndex = node->getSymbol()->getTokenIndex();
 
         // Grab any tokens we may have skipped from before this terminal.
-        auto tokens = m_tokens->get(m_tokenScanIndex, tokenIndex);
-        scanWhitespaceTokens(tokens);
+        if (m_tokenScanIndex < tokenIndex) {
+            auto tokens = m_tokens->get(m_tokenScanIndex, tokenIndex);
+            scanWhitespaceTokens(tokens);
+        }
 
         // Look for any to the right of this.
-        tokens = m_tokens->getHiddenTokensToRight(m_tokenScanIndex, 1);
+        auto tokens = m_tokens->getHiddenTokensToRight(m_tokenScanIndex, 1);
         scanWhitespaceTokens(tokens);
     }
 
@@ -35,7 +36,7 @@ private:
                 m_issues->emplace_back(IssueNumber::kCarriageReturnInFile, token->getLine(),
                                        token->getCharPositionInLine());
             }
-            m_tokenScanIndex = token->getTokenIndex();
+            m_tokenScanIndex = token->getTokenIndex() + 1;
         }
     }
 

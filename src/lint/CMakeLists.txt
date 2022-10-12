@@ -8,6 +8,7 @@ add_library(lint STATIC
     Config.hpp
     detectors/Detector.cpp
     detectors/Detector.hpp
+    detectors/LintTest.hpp
     detectors/MethodReturnLexicalScope.hpp
     detectors/Whitespace.hpp
 

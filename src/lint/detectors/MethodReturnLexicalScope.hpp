@@ -3,51 +3,9 @@
 
 #include "detectors/Detector.hpp"
 
-#include "SCParserBaseListener.h"
-
 #include <string>
 
 namespace lint {
-
-/*
-Test Code:
-
-True Positive:
-Function {
-    prTry {
-        var result, thread = thisThread;
-        var next = thread.exceptionHandler,
-        wasInProtectedFunc = Exception.inProtectedFunction;
-        thread.exceptionHandler = {|error|
-            thread.exceptionHandler = next; // pop
-            ^error  // HERE
-        };
-        Exception.inProtectedFunction = true;
-        result = this.value;
-        Exception.inProtectedFunction = wasInProtectedFunc;
-        thread.exceptionHandler = next; // pop
-        ^result
-    }
-}
-
-False Positive:
-Quark {
-    dependencies {
-        var deps = this.data['dependencies'] ?? {^[]};  // HERE
-        if(deps.isSequenceableCollection.not, {
-            ("Invalid dependencies " + this + deps).warn;
-            ^[]
-        });
-        ^deps.collect({ |dep|
-            var q = Quark.parseDependency(dep, this);
-            if(q.isNil, {
-                "% not found".format(dep).warn;
-            });
-            q
-        }).select({ |it| it.notNil });
-    }
-}
-*/
 
 class MethodReturnLexicalScope : public Detector {
 public:
@@ -61,7 +19,7 @@ public:
         if (!ctx->returnExpr() || m_inArgsCount > 0 || m_inBlockCount == 0 || m_inNamedAssignCount == 0)
             return;
 
-        m_issues->emplace_back(IssueNumber::kMethodReturnInNamedFunction, ctx->returnExpr()->start->getLine(),
+        m_issues->emplace_back(IssueNumber::kMethodReturnInLexicalScope, ctx->returnExpr()->start->getLine(),
                                ctx->returnExpr()->start->getCharPositionInLine());
     }
 

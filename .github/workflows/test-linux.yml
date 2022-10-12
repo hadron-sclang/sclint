@@ -28,4 +28,7 @@ jobs:
         run: |
           cd $BUILD_PATH
           cmake --build .
-
+      - name: test
+        run: |
+          cd $BUILD_PATH
+          ctest -C Debug -T test --output-on-failure

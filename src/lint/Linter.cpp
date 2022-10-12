@@ -1,6 +1,7 @@
 #include "Linter.hpp"
 
 #include "Config.hpp"
+#include "detectors/LintTest.hpp"
 #include "detectors/MethodReturnLexicalScope.hpp"
 #include "detectors/Whitespace.hpp"
 
@@ -24,6 +25,10 @@ bool Linter::lint() {
 
     if (m_config->noMethodReturnWithLexicalScope)
         m_mux.addDetector(std::make_unique<MethodReturnLexicalScope>());
+
+    // Needs to go in last, if present.
+    if (m_config->lintTest)
+        m_mux.addDetector(std::make_unique<LintTest>(&tokens));
 
     antlr4::tree::ParseTreeWalker::DEFAULT.walk(&m_mux, parser.root());
 

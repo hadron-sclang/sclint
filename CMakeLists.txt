@@ -28,3 +28,5 @@ message(STATUS "sclint v${PROJECT_VERSION}, ${GIT_BRANCH}@${GIT_COMMIT_HASH}")
 
 add_subdirectory(third_party)
 add_subdirectory(src)
+enable_testing()
+add_subdirectory(tests)
