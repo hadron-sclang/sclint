@@ -2,7 +2,7 @@ include(CTest)
 
 # OneNewlineAtEndOfFile
 add_test(NAME OneNewlineAtEndOfFile_no_newline COMMAND
-    sclint "--style=file" "${CMAKE_CURRENT_SOURCE_DIR}/OneNewlineAtEndOfFile/no_newline.scd"
+    sclint "--style=file" --printConfig "${CMAKE_CURRENT_SOURCE_DIR}/OneNewlineAtEndOfFile/no_newline.scd"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/OneNewlineAtEndOfFile"
 )
 
