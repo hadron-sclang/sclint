@@ -2,7 +2,7 @@ name: test-linux
 on: [push, pull_request]
 jobs:
   test-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       BUILD_PATH: ${{ github.workspace }}/build
     steps:
@@ -12,7 +12,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes ninja-build cmake build-essential
+          sudo apt-get install --yes ninja-build cmake build-essential gcc
           mkdir -p $BUILD_PATH/install-ext/{lib,bin}
           cd $BUILD_PATH/install-ext/lib
           curl -O https://www.antlr.org/download/antlr-4.11.1-complete.jar

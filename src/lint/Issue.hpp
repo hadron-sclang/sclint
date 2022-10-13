@@ -1,6 +1,7 @@
 #ifndef SRC_LINT_ISSUE_HPP_
 #define SRC_LINT_ISSUE_HPP_
 
+#include <cstdlib>
 #include <array>
 
 namespace lint {
