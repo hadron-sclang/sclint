@@ -1,57 +1,17 @@
-#ifndef SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
-#define SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#ifndef SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#define SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
 
-#include "Detector.hpp"
-
-#include "SCParserBaseListener.h"
+#include "detectors/Detector.hpp"
 
 #include <string>
 
-namespace sclint {
-
-/*
-Test Code:
-
-True Positive:
-Function {
-    prTry {
-        var result, thread = thisThread;
-        var next = thread.exceptionHandler,
-        wasInProtectedFunc = Exception.inProtectedFunction;
-        thread.exceptionHandler = {|error|
-            thread.exceptionHandler = next; // pop
-            ^error  // HERE
-        };
-        Exception.inProtectedFunction = true;
-        result = this.value;
-        Exception.inProtectedFunction = wasInProtectedFunc;
-        thread.exceptionHandler = next; // pop
-        ^result
-    }
-}
-
-False Positive:
-Quark {
-    dependencies {
-        var deps = this.data['dependencies'] ?? {^[]};  // HERE
-        if(deps.isSequenceableCollection.not, {
-            ("Invalid dependencies " + this + deps).warn;
-            ^[]
-        });
-        ^deps.collect({ |dep|
-            var q = Quark.parseDependency(dep, this);
-            if(q.isNil, {
-                "% not found".format(dep).warn;
-            });
-            q
-        }).select({ |it| it.notNil });
-    }
-}
-*/
+namespace lint {
 
 class MethodReturnLexicalScope : public Detector {
 public:
-    MethodReturnLexicalScope(): Detector(), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
+    MethodReturnLexicalScope() = delete;
+    MethodReturnLexicalScope(const Config* config, std::vector<Issue>* issues):
+        Detector(config, issues), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
     virtual ~MethodReturnLexicalScope() = default;
 
     void enterBlock(sprklr::SCParser::BlockContext*) override { ++m_inBlockCount; }
@@ -61,8 +21,8 @@ public:
         if (!ctx->returnExpr() || m_inArgsCount > 0 || m_inBlockCount == 0 || m_inNamedAssignCount == 0)
             return;
 
-        m_issues->emplace_back(ctx->returnExpr()->start->getLine(), ctx->returnExpr()->start->getCharPositionInLine(),
-                               std::string("method return in named function"));
+        m_issues->emplace_back(IssueNumber::kMethodReturnInLexicalScope, ctx->returnExpr()->start->getLine(),
+                               ctx->returnExpr()->start->getCharPositionInLine());
     }
 
     void enterExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext*) override { ++m_inNamedAssignCount; }
@@ -97,6 +57,6 @@ private:
     int m_inArgsCount;
 };
 
-} // namespace sclint
+} // namespace lint
 
-#endif // SCLINT_SRC_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#endif // SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
