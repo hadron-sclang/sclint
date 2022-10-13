@@ -10,7 +10,6 @@ add_library(lint STATIC
     detectors/Detector.hpp
     detectors/LintTest.hpp
     detectors/MethodReturnLexicalScope.hpp
-    detectors/Whitespace.hpp
 
     Issue.hpp
     Linter.cpp

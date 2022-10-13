@@ -17,27 +17,22 @@ struct Config;
 
 class Detector : public sprklr::SCParserBaseListener {
 public:
-    Detector() = default;
+    Detector() = delete;
+    Detector(const Config* config, std::vector<Issue>* issues): m_config(config), m_issues(issues) { }
     virtual ~Detector() = default;
 
-    void setIssues(std::vector<Issue>* issues) { m_issues = issues; }
-    void setConfig(const Config* config) { m_config = config; }
-
 protected:
-    std::vector<Issue>* m_issues = nullptr;
     const Config* m_config;
+    std::vector<Issue>* m_issues = nullptr;
 };
 
 class DetectorMux : public sprklr::SCParserBaseListener {
 public:
-    DetectorMux() = delete;
-    DetectorMux(const Config* config);
+    DetectorMux() = default;
     ~DetectorMux() = default;
 
     void clearDetectors();
     void addDetector(std::unique_ptr<Detector> detector);
-
-    const std::vector<Issue>& issues() const { return m_issues; }
 
     // SCParserListener overrides
     void enterRoot(sprklr::SCParser::RootContext* ctx) override;
@@ -79,9 +74,7 @@ public:
     void visitTerminal(antlr4::tree::TerminalNode* node) override;
 
 private:
-    const Config* m_config;
     std::vector<std::unique_ptr<sprklr::SCParserListener>> m_detectors;
-    std::vector<Issue> m_issues;
 };
 
 } // namespace lint

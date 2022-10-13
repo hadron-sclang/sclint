@@ -2,15 +2,9 @@
 
 namespace lint {
 
-DetectorMux::DetectorMux(const Config* config): m_config(config) { }
-
 void DetectorMux::clearDetectors() { m_detectors.clear(); }
 
-void DetectorMux::addDetector(std::unique_ptr<Detector> detector) {
-    detector->setIssues(&m_issues);
-    detector->setConfig(m_config);
-    m_detectors.push_back(std::move(detector));
-}
+void DetectorMux::addDetector(std::unique_ptr<Detector> detector) { m_detectors.push_back(std::move(detector)); }
 
 void DetectorMux::enterRoot(sprklr::SCParser::RootContext* ctx) {
     std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterRoot(ctx); });

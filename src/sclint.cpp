@@ -14,13 +14,14 @@ namespace {
 
 std::unique_ptr<char[]> readFile(std::string fileName, size_t& codeSize) {
     codeSize = std::filesystem::file_size(fileName);
-    auto code = std::make_unique<char[]>(codeSize);
+    auto code = std::make_unique<char[]>(codeSize + 1);
     std::ifstream inFile(fileName, std::ifstream::binary);
     if (!inFile) {
         std::cerr << "Error opening input file: " << fileName << "\n";
         return nullptr;
     }
     inFile.read(code.get(), codeSize);
+    code.get()[codeSize] = '\0';
     if (!inFile) {
         std::cerr << "Error reading input file: " << fileName << "\n";
         return nullptr;
@@ -51,7 +52,8 @@ int main(int argc, char* argv[]) {
     if (FLAGS_style == "file") {
         auto configPath = std::filesystem::current_path() / ".sclint";
         while (!std::filesystem::exists(configPath)) {
-            configPath.remove_filename();
+            // Remove the filename first
+            configPath = configPath.parent_path();
             if (!configPath.has_parent_path()) {
                 std::cerr << "sclint got the -style=file command line, but couldn't find an .sclint file.\n";
                 return -1;

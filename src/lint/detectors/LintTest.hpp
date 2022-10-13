@@ -10,7 +10,8 @@ namespace lint {
 class LintTest : public Detector {
 public:
     LintTest() = delete;
-    explicit LintTest(antlr4::CommonTokenStream* tokens): Detector(), m_tokens(tokens), m_tokenScanIndex(0) { }
+    explicit LintTest(const Config* config, std::vector<Issue>* issues, antlr4::CommonTokenStream* tokens):
+        Detector(config, issues), m_tokens(tokens), m_tokenScanIndex(0) { }
     virtual ~LintTest() = default;
 
     void visitTerminal(antlr4::tree::TerminalNode* node) override {
@@ -41,15 +42,8 @@ private:
                     if (issueNumber == 0 || columnNumber == 0) {
                         m_issues->emplace_back(IssueNumber::kMalformedLintTestComment, lineNumber,
                                                token->getCharPositionInLine());
-                        continue;
-                    }
-                    // Check backward in issues to look for removal of issues
-                    auto iter = std::find(std::rbegin(*m_issues), std::rend(*m_issues),
-                                          Issue(static_cast<IssueNumber>(issueNumber), lineNumber, columnNumber));
-                    if (iter != m_issues->rbegin()) {
-                        m_issues->erase(iter.base());
                     } else {
-                        m_issues->emplace_back(kMissingExpectedLintTestIssue, lineNumber, columnNumber);
+                        m_issues->emplace_back(static_cast<IssueNumber>(issueNumber), lineNumber, columnNumber);
                     }
                 }
             }

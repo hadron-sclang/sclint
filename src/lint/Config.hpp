@@ -57,9 +57,6 @@ public:
     bool noMethodReturnWithLexicalScope = false;
     static constexpr const char* kNoMethodReturnWithLexicalScopeName = "noMethodReturnWithLexicalScope";
 
-    bool noCarriageReturnsInFile = false;
-    static constexpr const char* kNoCarriageReturnsInFileName = "noCarriageReturnsInFile";
-
     bool noSingleLetterVariableNames = false;
 
     bool lintTest = false;

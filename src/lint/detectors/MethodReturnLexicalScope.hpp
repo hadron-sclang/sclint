@@ -9,7 +9,9 @@ namespace lint {
 
 class MethodReturnLexicalScope : public Detector {
 public:
-    MethodReturnLexicalScope(): Detector(), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
+    MethodReturnLexicalScope() = delete;
+    MethodReturnLexicalScope(const Config* config, std::vector<Issue>* issues):
+        Detector(config, issues), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
     virtual ~MethodReturnLexicalScope() = default;
 
     void enterBlock(sprklr::SCParser::BlockContext*) override { ++m_inBlockCount; }

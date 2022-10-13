@@ -30,12 +30,6 @@ std::string Config::readJSON(std::string_view jsonString) {
         noMethodReturnWithLexicalScope = document[kNoMethodReturnWithLexicalScopeName].GetBool();
     }
 
-    if (document.HasMember(kNoCarriageReturnsInFileName)) {
-        if (!document[kNoCarriageReturnsInFileName].IsBool())
-            return std::string(kNoCarriageReturnsInFileName) + " not a boolean value.";
-        noCarriageReturnsInFile = document[kNoCarriageReturnsInFileName].GetBool();
-    }
-
     if (document.HasMember(kLintTestName)) {
         if (!document[kLintTestName].IsBool())
             return std::string(kLintTestName) + " not a boolean value.";
@@ -58,10 +52,6 @@ std::string Config::writeJSON() const {
     rapidjson::Value noMethodReturnWithLexicalScopeString;
     noMethodReturnWithLexicalScopeString.SetString(kNoMethodReturnWithLexicalScopeName, alloc);
     document.AddMember(noMethodReturnWithLexicalScopeString, rapidjson::Value(noMethodReturnWithLexicalScope), alloc);
-
-    rapidjson::Value noCarriageReturnsInFileString;
-    noCarriageReturnsInFileString.SetString(kNoCarriageReturnsInFileName, alloc);
-    document.AddMember(noCarriageReturnsInFileString, rapidjson::Value(noCarriageReturnsInFile), alloc);
 
     rapidjson::Value noLintTestString;
     noLintTestString.SetString(kLintTestName, alloc);
