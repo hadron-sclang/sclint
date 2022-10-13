@@ -41,6 +41,7 @@ bool Linter::lint() {
             else
                 break;
         }
+        assert(lastToken);
         if (newlineCount != 1) {
             m_issues.emplace_back(IssueNumber::kOneNewlineAtEndOfFile, lastToken->getLine(),
                                   lastToken->getCharPositionInLine() + lastToken->getStopIndex()
