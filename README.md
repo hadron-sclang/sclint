@@ -29,3 +29,13 @@ Linter features are subclasses of `Detector`, defined in src/lint/detectors/Dete
 5. Add your Detector to the list of files in src/lint/CMakeLists.txt
 6. Add your Detector to the list of files in src/lint/DetectorList.hpp
 
+## WASM Build (experimental)
+
+**macOS**: Can install emscripten SDK or `brew install emscripten`.
+
+```
+    mkdir build_em && cd build_em
+    emcmake cmake ..
+    cmake --build .
+```
+
