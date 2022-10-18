@@ -2,6 +2,7 @@
 #define SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
 
 #include "detectors/Detector.hpp"
+#include "Linter.hpp"
 
 #include <string>
 
@@ -10,8 +11,8 @@ namespace lint {
 class MethodReturnLexicalScope : public Detector {
 public:
     MethodReturnLexicalScope() = delete;
-    MethodReturnLexicalScope(const Config* config, std::vector<Issue>* issues):
-        Detector(config, issues), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
+    MethodReturnLexicalScope(Linter* linter, antlr4::TokenStreamRewriter* rewriter):
+        Detector(linter, rewriter), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
     virtual ~MethodReturnLexicalScope() = default;
 
     void enterBlock(sprklr::SCParser::BlockContext*) override { ++m_inBlockCount; }
@@ -21,8 +22,9 @@ public:
         if (!ctx->returnExpr() || m_inArgsCount > 0 || m_inBlockCount == 0 || m_inNamedAssignCount == 0)
             return;
 
-        m_issues->emplace_back(IssueNumber::kMethodReturnInLexicalScope, ctx->returnExpr()->start->getLine(),
-                               ctx->returnExpr()->start->getCharPositionInLine());
+        m_linter->addIssue({ IssueNumber::kMethodReturnInLexicalScope, IssueSeverity::kError,
+                             static_cast<int32_t>(ctx->returnExpr()->start->getLine()),
+                             static_cast<int32_t>(ctx->returnExpr()->start->getCharPositionInLine()) });
     }
 
     void enterExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext*) override { ++m_inNamedAssignCount; }

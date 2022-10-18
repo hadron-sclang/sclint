@@ -99,15 +99,21 @@ int main(int argc, char* argv[]) {
         return -1;
 
     lint::Linter linter(&config, std::string_view(code.get(), codeSize));
-    if (!linter.lint()) {
-        std::cerr << fmt::format("{} had syntax errors\n", fileName);
+    auto severity = linter.lint();
+    if (severity == lint::IssueSeverity::kFatal) {
+        std::cerr << fmt::format("{} had fatal parsing errors\n", fileName);
         return -1;
     }
 
     for (const auto& issue : linter.issues()) {
-        std::cout << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
+        if (issue.issueSeverity > lint::IssueSeverity::kWarning)
+            continue;
+        std::cerr << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
                                  lint::kIssueTextTable[issue.issueNumber]);
     }
+    if (severity > lint::IssueSeverity::kError) {
+        std::cout << linter.rewrittenString();
+    }
 
-    return linter.issues().size() ? 1 : 0;
+    return severity < lint::IssueSeverity::kWarning ? 1 : 0;
 }

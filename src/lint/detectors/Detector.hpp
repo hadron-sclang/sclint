@@ -11,19 +11,24 @@
 #include <string>
 #include <vector>
 
+namespace antlr4 {
+class TokenStreamRewriter;
+}
+
 namespace lint {
 
 struct Config;
+class Linter;
 
 class Detector : public sprklr::SCParserBaseListener {
 public:
     Detector() = delete;
-    Detector(const Config* config, std::vector<Issue>* issues): m_config(config), m_issues(issues) { }
+    Detector(Linter* linter, antlr4::TokenStreamRewriter* rewriter): m_linter(linter), m_rewriter(rewriter) { }
     virtual ~Detector() = default;
 
 protected:
-    const Config* m_config;
-    std::vector<Issue>* m_issues = nullptr;
+    Linter* m_linter;
+    antlr4::TokenStreamRewriter* m_rewriter;
 };
 
 class DetectorMux : public sprklr::SCParserBaseListener {

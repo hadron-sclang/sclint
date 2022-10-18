@@ -9,23 +9,27 @@
 
 namespace lint {
 
-Linter::Linter(const Config* config, std::string_view code): m_config(config), m_code(code) { }
+Linter::Linter(const Config* config, std::string_view code):
+    m_config(config), m_code(code), m_lowestSeverity(IssueSeverity::kNone) { }
 
-bool Linter::lint() {
+IssueSeverity Linter::lint() {
     antlr4::ANTLRInputStream input(m_code.data(), m_code.size());
     sprklr::SCLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
+    antlr4::TokenStreamRewriter rewriter(&tokens);
     sprklr::SCParser parser(&tokens);
-    if (parser.getNumberOfSyntaxErrors())
-        return false;
+    if (parser.getNumberOfSyntaxErrors()) {
+        m_lowestSeverity = IssueSeverity::kFatal;
+        return IssueSeverity::kFatal; // TODO: relay parse errors to user?
+    }
 
     m_mux.clearDetectors();
 
     if (m_config->noMethodReturnWithLexicalScope)
-        m_mux.addDetector(std::make_unique<MethodReturnLexicalScope>(m_config, &m_issues));
+        m_mux.addDetector(std::make_unique<MethodReturnLexicalScope>(this, &rewriter));
 
     if (m_config->lintTest)
-        m_mux.addDetector(std::make_unique<LintTest>(m_config, &m_expectedIssues, &tokens));
+        m_mux.addDetector(std::make_unique<LintTest>(this, &rewriter, &tokens));
 
     antlr4::tree::ParseTreeWalker::DEFAULT.walk(&m_mux, parser.root());
 
@@ -43,9 +47,15 @@ bool Linter::lint() {
         }
         assert(lastToken);
         if (newlineCount != 1) {
-            m_issues.emplace_back(IssueNumber::kOneNewlineAtEndOfFile, lastToken->getLine(),
-                                  lastToken->getCharPositionInLine() + lastToken->getStopIndex()
-                                      - lastToken->getStartIndex() + 1);
+            m_issues.emplace_back(IssueNumber::kOneNewlineAtEndOfFile, IssueSeverity::kLint,
+                                  static_cast<int32_t>(lastToken->getLine()),
+                                  static_cast<int32_t>(lastToken->getCharPositionInLine() + lastToken->getStopIndex()
+                                                       - lastToken->getStartIndex() + 1));
+            if (newlineCount == 0) {
+                rewriter.insertAfter(lastToken, "\n");
+            } else {
+                rewriter.Delete(lastToken->getTokenIndex() + 1, lastToken->getTokenIndex() + newlineCount);
+            }
         }
     }
 
@@ -54,19 +64,24 @@ bool Linter::lint() {
 
     if (m_config->lintTest) {
         std::sort(m_expectedIssues.begin(), m_expectedIssues.end());
+        m_lowestSeverity = IssueSeverity::kNone;
         // Copy issues to a new list, copying only those that aren't in the lintTest list as well.
         std::vector<Issue> filteredIssues;
         size_t testLintIndex = 0;
         size_t issueIndex = 0;
         while (testLintIndex < m_expectedIssues.size() || issueIndex < m_issues.size()) {
             if (testLintIndex == m_expectedIssues.size()) {
+                m_lowestSeverity = std::min(m_lowestSeverity, m_issues[issueIndex].issueSeverity);
                 filteredIssues.emplace_back(m_issues[issueIndex]);
                 ++issueIndex;
             } else if (issueIndex == m_issues.size()) {
+                m_lowestSeverity = std::min(m_lowestSeverity, m_expectedIssues[testLintIndex].issueSeverity);
                 filteredIssues.emplace_back(m_expectedIssues[testLintIndex]);
                 ++testLintIndex;
             } else if (m_expectedIssues[testLintIndex] < m_issues[issueIndex]) {
-                filteredIssues.emplace_back(kExpectedLintTestIssue, m_expectedIssues[testLintIndex].lineNumber,
+                m_lowestSeverity = std::min(m_lowestSeverity, IssueSeverity::kError);
+                filteredIssues.emplace_back(kExpectedLintTestIssue, IssueSeverity::kError,
+                                            m_expectedIssues[testLintIndex].lineNumber,
                                             m_expectedIssues[testLintIndex].columnNumber);
                 ++testLintIndex;
             } else if (m_expectedIssues[testLintIndex] == m_issues[issueIndex]) {
@@ -74,6 +89,7 @@ bool Linter::lint() {
                 ++testLintIndex;
                 ++issueIndex;
             } else {
+                m_lowestSeverity = std::min(m_lowestSeverity, m_issues[issueIndex].issueSeverity);
                 filteredIssues.emplace_back(m_issues[issueIndex]);
                 ++issueIndex;
             }
@@ -82,7 +98,15 @@ bool Linter::lint() {
         m_issues.swap(filteredIssues);
     }
 
-    return true;
+    m_rewritten = rewriter.getText();
+    return m_lowestSeverity;
 }
+
+void Linter::addIssue(Issue&& issue) {
+    m_lowestSeverity = std::min(m_lowestSeverity, issue.issueSeverity);
+    m_issues.push_back(issue);
+}
+
+void Linter::addExpectedIssue(Issue&& issue) { m_expectedIssues.push_back(issue); }
 
 } // namespace lint
