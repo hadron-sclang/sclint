@@ -32,6 +32,9 @@ std::unique_ptr<char[]> readFile(std::string fileName, size_t& codeSize) {
 
 } // namespace
 
+DEFINE_bool(printConfig, false,
+            "If true, sclint will process whatever style commands are present and then print the "
+            "current configuration to stdout before exiting.");
 DEFINE_string(style, "",
               "If unspecified this means the default SCLang style as documented on the SuperCollider "
               "website.\n\n"
@@ -39,10 +42,9 @@ DEFINE_string(style, "",
               "directory and upwards to find the first .sclint file, which is expected to be a JSON "
               "dictionary of style configuration settings.\n\n"
               "Lastly, the style flag can be a JSON string in which case sclint will parse it directly.");
-
-DEFINE_bool(printConfig, false,
-            "If true, sclint will process whatever style commands are present and then print the "
-            "current configuration to stdout before exiting.");
+DEFINE_string(checkAgainst, "",
+              "Used for testing. Instead of printing the formatted code to stdout, sclint compares the formatted code "
+              "to that provided in the file path, returning an error if they are different.");
 
 int main(int argc, char* argv[]) {
     gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -99,15 +101,46 @@ int main(int argc, char* argv[]) {
         return -1;
 
     lint::Linter linter(&config, std::string_view(code.get(), codeSize));
-    if (!linter.lint()) {
-        std::cerr << fmt::format("{} had syntax errors\n", fileName);
+    auto severity = linter.lint();
+    if (severity == lint::IssueSeverity::kFatal) {
+        std::cerr << fmt::format("{} had fatal parsing errors\n", fileName);
         return -1;
     }
 
     for (const auto& issue : linter.issues()) {
-        std::cout << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
+        if (issue.issueSeverity > lint::IssueSeverity::kWarning)
+            continue;
+        std::cerr << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
                                  lint::kIssueTextTable[issue.issueNumber]);
     }
 
-    return linter.issues().size() ? 1 : 0;
+    if (!FLAGS_checkAgainst.empty()) {
+        size_t checkFileSize = 0;
+        auto checkFile = readFile(FLAGS_checkAgainst, checkFileSize);
+        if (!checkFile) {
+            std::cerr << fmt::format("Failed to read checkAgainst file at {}\n", FLAGS_checkAgainst);
+            return -1;
+        }
+        if (linter.rewrittenString().compare(std::string_view(checkFile.get(), checkFileSize)) != 0) {
+            std::cerr << fmt::format("linter string mismatch against check file {}\n", FLAGS_checkAgainst);
+            std::cerr << "linted string:" << std::endl;
+            for (size_t i = 0; i < linter.rewrittenString().size(); ++i) {
+                std::cerr << fmt::format("{:02x}'{}' ", static_cast<uint8_t>(linter.rewrittenString().data()[i]),
+                                         linter.rewrittenString().data()[i]);
+            }
+            std::cerr << std::endl << "check string:" << std::endl;
+            for (size_t i = 0; i < checkFileSize; ++i) {
+                std::cerr << fmt::format("{:02x}'{}' ", static_cast<uint8_t>(checkFile.get()[i]), checkFile.get()[i]);
+            }
+            std::cerr << std::endl;
+            return -1;
+        }
+        return 0;
+    }
+
+    if (severity > lint::IssueSeverity::kError) {
+        std::cout << linter.rewrittenString();
+    }
+
+    return severity < lint::IssueSeverity::kWarning ? 1 : 0;
 }

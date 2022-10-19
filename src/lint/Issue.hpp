@@ -6,7 +6,7 @@
 
 namespace lint {
 
-enum IssueNumber : size_t {
+enum IssueNumber : int32_t {
     kMethodReturnInLexicalScope = 1,
     kOneNewlineAtEndOfFile = 2,
     kMalformedLintTestComment = 3,
@@ -24,8 +24,12 @@ static constexpr std::array<const char*, kNumberOfIssueNumbers> kIssueTextTable 
     "missing expected lint test issue" // kMissingExpectedLintTestIssue
 };
 
+enum IssueSeverity : int32_t { kFatal = 0, kError = 1, kWarning = 2, kLint = 3, kNote = 4, kNone = 5 };
+
 struct Issue {
-    Issue(IssueNumber number, size_t line, size_t col): issueNumber(number), lineNumber(line), columnNumber(col) { }
+    Issue() = delete;
+    Issue(IssueNumber number, IssueSeverity severity, int32_t line, int32_t col):
+        issueNumber(number), issueSeverity(severity), lineNumber(line), columnNumber(col) { }
 
     bool operator==(const Issue& i) const {
         return issueNumber == i.issueNumber && lineNumber == i.lineNumber && columnNumber == i.columnNumber;
@@ -39,8 +43,9 @@ struct Issue {
     }
 
     IssueNumber issueNumber;
-    size_t lineNumber;
-    size_t columnNumber;
+    IssueSeverity issueSeverity;
+    int32_t lineNumber;
+    int32_t columnNumber;
 };
 
 } // namespace lint
