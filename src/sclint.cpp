@@ -32,6 +32,9 @@ std::unique_ptr<char[]> readFile(std::string fileName, size_t& codeSize) {
 
 } // namespace
 
+DEFINE_bool(printConfig, false,
+            "If true, sclint will process whatever style commands are present and then print the "
+            "current configuration to stdout before exiting.");
 DEFINE_string(style, "",
               "If unspecified this means the default SCLang style as documented on the SuperCollider "
               "website.\n\n"
@@ -39,10 +42,9 @@ DEFINE_string(style, "",
               "directory and upwards to find the first .sclint file, which is expected to be a JSON "
               "dictionary of style configuration settings.\n\n"
               "Lastly, the style flag can be a JSON string in which case sclint will parse it directly.");
-
-DEFINE_bool(printConfig, false,
-            "If true, sclint will process whatever style commands are present and then print the "
-            "current configuration to stdout before exiting.");
+DEFINE_string(checkAgainst, "",
+              "Used for testing. Instead of printing the formatted code to stdout, sclint compares the formatted code "
+              "to that provided in the file path, returning an error if they are different.");
 
 int main(int argc, char* argv[]) {
     gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -111,6 +113,21 @@ int main(int argc, char* argv[]) {
         std::cerr << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
                                  lint::kIssueTextTable[issue.issueNumber]);
     }
+
+    if (!FLAGS_checkAgainst.empty()) {
+        size_t checkFileSize = 0;
+        auto checkFile = readFile(FLAGS_checkAgainst, checkFileSize);
+        if (!checkFile) {
+            std::cerr << fmt::format("Failed to read checkAgainst file at {}\n", FLAGS_checkAgainst);
+            return -1;
+        }
+        if (linter.rewrittenString().compare(std::string_view(checkFile.get(), checkFileSize)) != 0) {
+            std::cerr << fmt::format("linter string mismatch against check file {}\n", FLAGS_checkAgainst);
+            return -1;
+        }
+        return 0;
+    }
+
     if (severity > lint::IssueSeverity::kError) {
         std::cout << linter.rewrittenString();
     }

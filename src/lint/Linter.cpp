@@ -54,7 +54,7 @@ IssueSeverity Linter::lint() {
             if (newlineCount == 0) {
                 rewriter.insertAfter(lastToken, "\n");
             } else {
-                rewriter.Delete(lastToken->getTokenIndex() + 1, lastToken->getTokenIndex() + newlineCount);
+                rewriter.Delete(lastToken->getTokenIndex() + 1, lastToken->getTokenIndex() + newlineCount - 1);
             }
         }
     }
