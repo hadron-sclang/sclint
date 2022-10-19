@@ -125,12 +125,12 @@ int main(int argc, char* argv[]) {
             std::cerr << fmt::format("linter string mismatch against check file {}\n", FLAGS_checkAgainst);
             std::cerr << "linted string:" << std::endl;
             for (size_t i = 0; i < linter.rewrittenString().size(); ++i) {
-                std::cerr << fmt::format("{:08x} '{}'", static_cast<uint8_t>(linter.rewrittenString().data()[i]),
+                std::cerr << fmt::format("{:02x}'{}' ", static_cast<uint8_t>(linter.rewrittenString().data()[i]),
                                          linter.rewrittenString().data()[i]);
             }
             std::cerr << std::endl << "check string:" << std::endl;
             for (size_t i = 0; i < checkFileSize; ++i) {
-                std::cerr << fmt::format("{:08x} '{}'", static_cast<uint8_t>(checkFile.get()[i]), checkFile.get()[i]);
+                std::cerr << fmt::format("{:02x}'{}' ", static_cast<uint8_t>(checkFile.get()[i]), checkFile.get()[i]);
             }
             std::cerr << std::endl;
             return -1;

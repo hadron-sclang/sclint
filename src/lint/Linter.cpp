@@ -55,10 +55,17 @@ IssueSeverity Linter::lint() {
                                   static_cast<int32_t>(lastToken->getCharPositionInLine() + lastToken->getStopIndex()
                                                        - lastToken->getStartIndex() + 1));
             if (newlineCount == 0) {
+#if WIN32
+                rewriter.insertAfter(lastToken, "\r\n");
+#else
                 rewriter.insertAfter(lastToken, "\n");
+#endif // WIN32
             } else {
-                rewriter.Delete(lastToken->getTokenIndex() + 1,
-                                lastToken->getTokenIndex() + newlineCount + carriageReturnCount - 1);
+                if (carriageReturnCount > 0)
+                    rewriter.Delete(lastToken->getTokenIndex() + 2,
+                                    lastToken->getTokenIndex() + newlineCount + carriageReturnCount - 1);
+                else
+                    rewriter.Delete(lastToken->getTokenIndex() + 1, lastToken->getTokenIndex() + newlineCount - 1);
             }
         }
     }
