@@ -119,6 +119,15 @@ int main(int argc, char* argv[]) {
         auto checkFile = readFile(FLAGS_checkAgainst, checkFileSize);
         if (!checkFile) {
             std::cerr << fmt::format("Failed to read checkAgainst file at {}\n", FLAGS_checkAgainst);
+            std::cerr << "linted string:" << std::endl;
+            for (size_t i = 0; i < linter.rewrittenString().size(); ++i) {
+                std::cerr << fmt::format("{:08x} ", static_cast<uint8_t>(linter.rewrittenString().data()[i]));
+            }
+            std::cerr << std::endl << "check string:" << std::endl;
+            for (size_t i = 0; i < checkFileSize; ++i) {
+                std::cerr << fmt::format("{:08x} ", static_cast<uint8_t>(checkFile.get()[i]));
+            }
+            std::cerr << std::endl;
             return -1;
         }
         if (linter.rewrittenString().compare(std::string_view(checkFile.get(), checkFileSize)) != 0) {
