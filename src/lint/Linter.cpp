@@ -36,11 +36,14 @@ IssueSeverity Linter::lint() {
     // Easier just to scan tokens for the last one being a newline.
     if (m_config->oneNewlineAtEndOfFile) {
         int newlineCount = 0;
+        int carriageReturnCount = 0;
         antlr4::Token* lastToken = nullptr;
         // Last token in the token stream is EOF, so skip it too.
         for (int i = static_cast<int>(tokens.size()) - 2; i >= 0; --i) {
             lastToken = tokens.get(i);
-            if (lastToken->getType() == sprklr::SCParser::NEWLINE)
+            if (lastToken->getType() == sprklr::SCParser::CARRIAGE_RETURN)
+                ++carriageReturnCount;
+            else if (lastToken->getType() == sprklr::SCParser::NEWLINE)
                 ++newlineCount;
             else
                 break;
@@ -54,7 +57,8 @@ IssueSeverity Linter::lint() {
             if (newlineCount == 0) {
                 rewriter.insertAfter(lastToken, "\n");
             } else {
-                rewriter.Delete(lastToken->getTokenIndex() + 1, lastToken->getTokenIndex() + newlineCount - 1);
+                rewriter.Delete(lastToken->getTokenIndex() + 1,
+                                lastToken->getTokenIndex() + newlineCount + carriageReturnCount - 1);
             }
         }
     }
