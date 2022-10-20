@@ -12,16 +12,19 @@ enum IssueNumber : int32_t {
     kMalformedLintTestComment = 3,
     kMissingExpectedLintTestIssue = 4,
     kExpectedLintTestIssue = 5,
-    kNumberOfIssueNumbers = 6
+    kWarnOnCurryArgument = 6,
+    // Insert new issues above, increment number below.
+    kNumberOfIssueNumbers = 7,
 };
 
 static constexpr std::array<const char*, kNumberOfIssueNumbers> kIssueTextTable = {
-    "no error.", // reserve zero to indicate bad error code.
-    "method return in lexical scope.", // kMethodReturnInLexicalScope
+    "no error", // reserve zero to indicate bad error code.
+    "method return in lexical scope", // kMethodReturnInLexicalScope
     "use exactly one newline at the end of a file", // kOneNewlineAtEndOfFile
     "malformed lint test comment", // kMalformedLintTestComment
     "expected lint test issue", // kExpectedLintTestIssue
-    "missing expected lint test issue" // kMissingExpectedLintTestIssue
+    "missing expected lint test issue", // kMissingExpectedLintTestIssue
+    "avoid use of curry argument (_)" // kWarnOnCurryArgument
 };
 
 enum IssueSeverity : int32_t { kFatal = 0, kError = 1, kWarning = 2, kLint = 3, kNote = 4, kNone = 5 };

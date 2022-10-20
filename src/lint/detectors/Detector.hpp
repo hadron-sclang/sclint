@@ -76,6 +76,9 @@ public:
     void enterKeyArgList(sprklr::SCParser::KeyArgListContext* ctx) override;
     void exitKeyArgList(sprklr::SCParser::KeyArgListContext* ctx) override;
 
+    void enterExprCurryArg(sprklr::SCParser::ExprCurryArgContext* ctx) override;
+    void exitExprCurryArg(sprklr::SCParser::ExprCurryArgContext* ctx) override;
+
     void visitTerminal(antlr4::tree::TerminalNode* node) override;
 
 private:

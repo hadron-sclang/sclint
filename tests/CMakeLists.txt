@@ -27,3 +27,9 @@ add_test(NAME MethodReturnInLexicalScope_false_positive COMMAND
     sclint "--style=file" "${CMAKE_CURRENT_SOURCE_DIR}/NoMethodReturnWithLexicalScope/false_positive.scd"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/NoMethodReturnWithLexicalScope"
 )
+
+# WarnOnCurryArgument
+add_test(NAME WarnOnCurryArgument_true_positive COMMAND
+    sclint "--style=file" "true_positive.scd"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/WarnOnCurryArgument"
+)

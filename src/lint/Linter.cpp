@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "detectors/LintTest.hpp"
 #include "detectors/MethodReturnLexicalScope.hpp"
+#include "detectors/WarnOnCurryArgument.hpp"
 
 #include "SCLexer.h"
 #include "SCParser.h"
@@ -30,6 +31,9 @@ IssueSeverity Linter::lint() {
 
     if (m_config->lintTest)
         m_mux.addDetector(std::make_unique<LintTest>(this, &rewriter, &tokens));
+
+    if (m_config->warnOnCurryArgument)
+        m_mux.addDetector(std::make_unique<WarnOnCurryArgument>(this, &rewriter));
 
     antlr4::tree::ParseTreeWalker::DEFAULT.walk(&m_mux, parser.root());
 

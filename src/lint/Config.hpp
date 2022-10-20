@@ -61,6 +61,9 @@ public:
 
     bool lintTest = false;
     static constexpr const char* kLintTestName = "lintTest";
+
+    bool warnOnCurryArgument = false;
+    static constexpr const char* kWarnOnCurryArgumentName = "warnOnCurryArgument";
 };
 
 } // namespace sclint

@@ -108,6 +108,14 @@ void DetectorMux::exitKeyArgList(sprklr::SCParser::KeyArgListContext* ctx) {
     std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitKeyArgList(ctx); });
 }
 
+void DetectorMux::enterExprCurryArg(sprklr::SCParser::ExprCurryArgContext* ctx) {
+    std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->enterExprCurryArg(ctx); });
+}
+
+void DetectorMux::exitExprCurryArg(sprklr::SCParser::ExprCurryArgContext* ctx) {
+    std::for_each(m_detectors.begin(), m_detectors.end(), [ctx](auto& detector) { detector->exitExprCurryArg(ctx); });
+}
+
 void DetectorMux::visitTerminal(antlr4::tree::TerminalNode* node) {
     std::for_each(m_detectors.begin(), m_detectors.end(), [node](auto& detector) { detector->visitTerminal(node); });
 }
