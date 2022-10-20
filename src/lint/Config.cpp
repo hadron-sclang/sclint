@@ -30,6 +30,12 @@ std::string Config::readJSON(std::string_view jsonString) {
         noMethodReturnWithLexicalScope = document[kNoMethodReturnWithLexicalScopeName].GetBool();
     }
 
+    if (document.HasMember(kWarnOnCurryArgumentName)) {
+        if (!document[kWarnOnCurryArgumentName].IsBool())
+            return std::string(kWarnOnCurryArgumentName) + " not a boolean value.";
+        warnOnCurryArgument = document[kWarnOnCurryArgumentName].GetBool();
+    }
+
     if (document.HasMember(kLintTestName)) {
         if (!document[kLintTestName].IsBool())
             return std::string(kLintTestName) + " not a boolean value.";
@@ -52,6 +58,10 @@ std::string Config::writeJSON() const {
     rapidjson::Value noMethodReturnWithLexicalScopeString;
     noMethodReturnWithLexicalScopeString.SetString(kNoMethodReturnWithLexicalScopeName, alloc);
     document.AddMember(noMethodReturnWithLexicalScopeString, rapidjson::Value(noMethodReturnWithLexicalScope), alloc);
+
+    rapidjson::Value warnOnCurryArgumentString;
+    warnOnCurryArgumentString.SetString(kWarnOnCurryArgumentName, alloc);
+    document.AddMember(warnOnCurryArgumentString, rapidjson::Value(warnOnCurryArgument), alloc);
 
     rapidjson::Value noLintTestString;
     noLintTestString.SetString(kLintTestName, alloc);
