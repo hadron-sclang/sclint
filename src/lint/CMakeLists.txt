@@ -6,13 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 add_library(lint STATIC
     Config.cpp
     Config.hpp
-    detectors/Detector.cpp
     detectors/Detector.hpp
     detectors/LintTest.hpp
     detectors/MethodReturnLexicalScope.hpp
     detectors/WarnOnCurryArgument.hpp
 
     Issue.hpp
+    ListenerMux.cpp
+    ListenerMux.hpp
     Linter.cpp
     Linter.hpp
 )
