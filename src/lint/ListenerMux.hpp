@@ -1,11 +1,11 @@
 #ifndef SRC_LINT_LISTENER_MUX_HPP_
 #define SRC_LINT_LISTENER_MUX_HPP_
 
-#include "detectors/Detector.hpp"
-
 #include "tree/ParseTreeListener.h"
 
 namespace lint {
+
+class Detector;
 
 // A multiplexer for Detectors. For each listener function it calls the same function on every Detector added to it.
 // This allows us to use multiple detectors but only walk the tree once. Follows the pattern established in
@@ -25,7 +25,7 @@ public:
     void exitEveryRule(antlr4::ParserRuleContext* ctx) override;
 
 private:
-    std::vector<std::unique_ptr<Detector>> m_detectors;
+    std::vector<Detector*> m_detectors;
 };
 
 } // namespace lint

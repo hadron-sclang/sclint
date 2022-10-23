@@ -3,20 +3,28 @@
 
 #include <string_view>
 #include <string>
+#include <unordered_map>
 
 namespace lint {
 
 // Holds the current configuration of the linter.
-struct Config {
+class Config {
 public:
     // Build a default configuration (SCStyle)
-    Config() = default;
+    Config() { initDefaults(); }
     ~Config() = default;
 
+    // Set all options to their default values. Called by the constructor.
+    void initDefaults();
+
+    // Returns an empty string on success or an error message if the JSON didn't parse correctly.
     std::string readJSON(std::string_view jsonString);
+
+    // Returns a JSON string of the options.
     std::string writeJSON() const;
 
-    // These flags are all named for the *desired* code to pass linting.
+    bool getOptionNamed(const std::string& name) const;
+    void setOptionNamed(const std::string& name, bool value);
 
     // ** Whitespace **
 
@@ -64,6 +72,9 @@ public:
 
     bool warnOnCurryArgument = false;
     static constexpr const char* kWarnOnCurryArgumentName = "warnOnCurryArgument";
+
+private:
+    std::unordered_map<std::string, bool> m_options;
 };
 
 } // namespace sclint

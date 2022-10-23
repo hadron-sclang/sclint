@@ -1,11 +1,47 @@
 #include "Config.hpp"
 
+#include "detectors/DetectorList.hpp"
+
 #include "rapidjson/document.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 
+namespace {
+/*
+template<typename T>
+void setDefaults(lint::Config* config, T) {
+    config->setOptionNamed(T::kOptionName, T::kDefaultValue);
+}
+
+template<typename T, typename... Ts>
+void setDefaults(lint::Config* config, T, Ts... ts) {
+    config->setOptionNamed(T::kOptionName, T::kDefaultValue);
+    setDefaults(config, ts...);
+}
+*/
+
+template<typename T>
+void setDefault(lint::Config* config) {
+    config->setOptionNamed(T::kOptionName, T::kDefaultValue);
+}
+
+template<typename T, typename... Ts>
+void setDefaults<lint::TypeList<T, Ts>>(lint::Config* config) {
+    setDefault<T>(config);
+    setDefaults<Ts...>(config);
+}
+
+template<>
+void setDefaults<lint::TypeList<>>(lint::Config*) { }
+
+} // namespace
+
 namespace lint {
+
+void Config::initDefaults() {
+    setDefaults<DetectorList>(this);
+}
 
 std::string Config::readJSON(std::string_view jsonString) {
     rapidjson::Document document;
