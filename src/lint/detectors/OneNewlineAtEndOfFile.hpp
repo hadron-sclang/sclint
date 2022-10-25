@@ -38,7 +38,7 @@ public:
                   kOptionName });
             if (newlineCount == 0) {
 #if WIN32
-                rewriter.insertAfter(lastToken, "\r\n");
+                m_rewriter->insertAfter(lastToken, "\r\n");
 #else
                 m_rewriter->insertAfter(lastToken, "\n");
 #endif // WIN32
