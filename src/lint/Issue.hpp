@@ -12,7 +12,7 @@ enum IssueNumber : int32_t {
     kMalformedLintTestComment = 3,
     kMissingExpectedLintTestIssue = 4,
     kExpectedLintTestIssue = 5,
-    kWarnOnCurryArgument = 6,
+    kAvoidCurryArgument = 6,
     // Insert new issues above, increment number below.
     kNumberOfIssueNumbers = 7,
 };

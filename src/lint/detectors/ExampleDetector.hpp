@@ -1,6 +1,17 @@
+// HOW TO ADD A NEW DETECTOR:
+//
+// Make a copy of this file in the same detectors/ directory.
+
 // TODO: rename the header guards to match your class and file name.
 #ifndef SRC_LIST_DETECTORS_EXAMPLE_DETECTOR_HPP_
 #define SRC_LIST_DETECTORS_EXAMPLE_DETECTOR_HPP_
+
+// TODO: please add this file to src/lint/CMakeLists.txt.
+
+// TODO: add an #include to this file in src/lint/detectors/DetectorList.hpp, and add the type to the list of types
+// in that file.
+
+// TODO: Please add tests!
 
 #include "detectors/Detector.hpp"
 

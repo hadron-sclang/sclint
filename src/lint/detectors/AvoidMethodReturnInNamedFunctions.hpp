@@ -1,5 +1,5 @@
-#ifndef SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
-#define SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#ifndef SRC_LINT_DETECTORS_AVOID_METHOD_RETURN_IN_NAMED_FUNCTIONS_HPP_
+#define SRC_LINT_DETECTORS_AVOID_METHOD_RETURN_IN_NAMED_FUNCTIONS_HPP_
 
 #include "detectors/Detector.hpp"
 #include "Linter.hpp"
@@ -8,12 +8,16 @@
 
 namespace lint {
 
-class MethodReturnLexicalScope : public Detector {
+class AvoidMethodReturnInNamedFunctions : public Detector {
 public:
-    MethodReturnLexicalScope() = delete;
-    MethodReturnLexicalScope(Linter* linter, antlr4::TokenStreamRewriter* rewriter):
-        Detector(linter, rewriter), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
-    virtual ~MethodReturnLexicalScope() = default;
+    AvoidMethodReturnInNamedFunctions() = delete;
+    AvoidMethodReturnInNamedFunctions(Linter* linter, antlr4::CommonTokenStream* tokens,
+                                      antlr4::TokenStreamRewriter* rewriter):
+        Detector(linter, tokens, rewriter), m_inBlockCount(0), m_inNamedAssignCount(0), m_inArgsCount(0) { }
+    virtual ~AvoidMethodReturnInNamedFunctions() = default;
+
+    static constexpr const char* kOptionName = "avoidMethodReturnInNamedFunctions";
+    static constexpr bool kDefaultValue = false;
 
     void enterBlock(sprklr::SCParser::BlockContext*) override { ++m_inBlockCount; }
     void exitBlock(sprklr::SCParser::BlockContext*) override { --m_inBlockCount; }
@@ -61,4 +65,4 @@ private:
 
 } // namespace lint
 
-#endif // SRC_LINT_DETECTORS_METHOD_RETURN_LEXICAL_SCOPE_HPP_
+#endif // SRC_LINT_DETECTORS_AVOID_METHOD_RETURN_IN_NAMED_FUNCTIONS_HPP_

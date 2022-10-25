@@ -1,0 +1,4 @@
+{
+    "lintTest": true,
+    "avoidMethodReturnInNamedFunctions": true
+}

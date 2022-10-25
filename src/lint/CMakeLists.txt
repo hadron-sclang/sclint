@@ -5,13 +5,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 # lint
 add_library(lint STATIC
     # TODO: Add new detectors to this list here in alphabetical order
+    detectors/AvoidCurryArgument.hpp
+    detectors/AvoidMethodReturnInNamedFunctions.hpp
     detectors/Detector.hpp
     detectors/ExampleDetector.hpp
-    detectors/OneNewlineAtEndOfFile.hpp
-
     detectors/LintTest.hpp
-    detectors/MethodReturnLexicalScope.hpp
-    detectors/WarnOnCurryArgument.hpp
+    detectors/OneNewlineAtEndOfFile.hpp
 
     Config.cpp
     Config.hpp
