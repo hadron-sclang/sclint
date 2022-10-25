@@ -32,10 +32,10 @@ public:
         }
         assert(lastToken);
         if (newlineCount != 1) {
-            m_linter->addIssue({ IssueNumber::kOneNewlineAtEndOfFile, IssueSeverity::kLint,
-                                 static_cast<int32_t>(lastToken->getLine()),
-                                 static_cast<int32_t>(lastToken->getCharPositionInLine() + lastToken->getStopIndex()
-                                                      - lastToken->getStartIndex() + 1) });
+            m_linter->addIssue(
+                { IssueSeverity::kLint, lastToken->getLine(),
+                  lastToken->getCharPositionInLine() + lastToken->getStopIndex() - lastToken->getStartIndex() + 1,
+                  kOptionName });
             if (newlineCount == 0) {
 #if WIN32
                 rewriter.insertAfter(lastToken, "\r\n");

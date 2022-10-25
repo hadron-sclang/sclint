@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 #############
 # lint
 add_library(lint STATIC
-    # TODO: Add new detectors to this list here in alphabetical order
+    # TODO: Add new detectors to this list in alphabetical order
     detectors/AvoidCurryArgument.hpp
     detectors/AvoidMethodReturnInNamedFunctions.hpp
     detectors/Detector.hpp

@@ -111,8 +111,8 @@ int main(int argc, char* argv[]) {
     for (const auto& issue : linter.issues()) {
         if (issue.issueSeverity > lint::IssueSeverity::kWarning)
             continue;
-        std::cerr << fmt::format("{} line {} col {}: {}\n", fileName, issue.lineNumber, issue.columnNumber,
-                                 lint::kIssueTextTable[issue.issueNumber]);
+        std::cerr << fmt::format("{} line {} col {} ({}): {}\n", fileName, issue.lineNumber, issue.columnNumber,
+                                 issue.detectorName, issue.message);
     }
 
     if (!FLAGS_checkAgainst.empty()) {

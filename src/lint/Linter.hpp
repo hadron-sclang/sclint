@@ -31,6 +31,8 @@ public:
     const std::string_view rewrittenString() const { return std::string_view(m_rewritten.data(), m_rewritten.size()); }
 
 private:
+    void filterExpectedIssues();
+
     const Config* m_config;
     std::string_view m_code;
     std::vector<Issue> m_issues;

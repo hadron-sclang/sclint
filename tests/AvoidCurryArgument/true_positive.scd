@@ -1,3 +1,3 @@
 (
-	_.sum.collect { |x| x } //+//: 6,1
+	_.sum.collect { |x| x } //+//: avoidCurryArgument,1
 )

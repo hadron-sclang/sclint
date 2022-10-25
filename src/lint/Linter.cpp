@@ -4,6 +4,7 @@
 #include "detectors/DetectorList.hpp"
 #include "ListenerMux.hpp"
 
+#include "fmt/format.h"
 #include "SCLexer.h"
 #include "SCParser.h"
 
@@ -52,41 +53,8 @@ IssueSeverity Linter::lint() {
     std::sort(m_issues.begin(), m_issues.end());
 
     // If testing is enabled, compare the list of expected issues to actual issues, and treat differences as an error.
-    if (m_config->getOptionNamed(LintTest::kOptionName)) {
-        std::sort(m_expectedIssues.begin(), m_expectedIssues.end());
-        m_lowestSeverity = IssueSeverity::kNone;
-
-        // Copy issues to a new list, copying only those that aren't in the lintTest list as well.
-        std::vector<Issue> filteredIssues;
-        size_t testLintIndex = 0;
-        size_t issueIndex = 0;
-        while (testLintIndex < m_expectedIssues.size() || issueIndex < m_issues.size()) {
-            if (testLintIndex == m_expectedIssues.size()) {
-                // We have run through all the expected issues, copy all remaining encountered issues to the new list.
-                m_lowestSeverity = std::min(m_lowestSeverity, m_issues[issueIndex].issueSeverity);
-                filteredIssues.emplace_back(m_issues[issueIndex]);
-                ++issueIndex;
-            } else if (issueIndex == m_issues.size() || m_expectedIssues[testLintIndex] < m_issues[issueIndex]) {
-                // This is a missing expected issue, treat as error.
-                m_lowestSeverity = std::min(m_lowestSeverity, IssueSeverity::kError);
-                filteredIssues.emplace_back(kExpectedLintTestIssue, IssueSeverity::kError,
-                                            m_expectedIssues[testLintIndex].lineNumber,
-                                            m_expectedIssues[testLintIndex].columnNumber);
-                ++testLintIndex;
-            } else if (m_expectedIssues[testLintIndex] == m_issues[issueIndex]) {
-                // Match of expected issue and actual issue, advance both indices past the match without copying.
-                ++testLintIndex;
-                ++issueIndex;
-            } else {
-                // Unexpected issue, copy directly and propagate error (if it is an error).
-                m_lowestSeverity = std::min(m_lowestSeverity, m_issues[issueIndex].issueSeverity);
-                filteredIssues.emplace_back(m_issues[issueIndex]);
-                ++issueIndex;
-            }
-        }
-
-        m_issues.swap(filteredIssues);
-    }
+    if (m_config->getOptionNamed(LintTest::kOptionName))
+        filterExpectedIssues();
 
     m_rewritten = rewriter.getText();
     return m_lowestSeverity;
@@ -98,5 +66,42 @@ void Linter::addIssue(Issue&& issue) {
 }
 
 void Linter::addExpectedIssue(Issue&& issue) { m_expectedIssues.push_back(issue); }
+
+void Linter::filterExpectedIssues() {
+    std::sort(m_expectedIssues.begin(), m_expectedIssues.end());
+    m_lowestSeverity = IssueSeverity::kNone;
+
+    // Copy issues to a new list, copying only those that aren't in the lintTest list as well.
+    std::vector<Issue> filteredIssues;
+    size_t testLintIndex = 0;
+    size_t issueIndex = 0;
+    while (testLintIndex < m_expectedIssues.size() || issueIndex < m_issues.size()) {
+        if (testLintIndex == m_expectedIssues.size()) {
+            // We have run through all the expected issues, copy all remaining encountered issues to the new list.
+            m_lowestSeverity = std::min(m_lowestSeverity, m_issues[issueIndex].issueSeverity);
+            filteredIssues.emplace_back(m_issues[issueIndex]);
+            ++issueIndex;
+        } else if (issueIndex == m_issues.size() || m_expectedIssues[testLintIndex] < m_issues[issueIndex]) {
+            // This is a missing expected issue, treat as error.
+            m_lowestSeverity = std::min(m_lowestSeverity, IssueSeverity::kError);
+            filteredIssues.emplace_back(
+                IssueSeverity::kError, m_expectedIssues[testLintIndex].lineNumber,
+                m_expectedIssues[testLintIndex].columnNumber, LintTest::kOptionName,
+                fmt::format("missing expected lint test issue '{}'.", m_expectedIssues[testLintIndex].detectorName));
+            ++testLintIndex;
+        } else if (m_expectedIssues[testLintIndex] == m_issues[issueIndex]) {
+            // Match of expected issue and actual issue, advance both indices past the match without copying.
+            ++testLintIndex;
+            ++issueIndex;
+        } else {
+            // Unexpected issue, copy directly and propagate error (if it is an error).
+            m_lowestSeverity = std::min(m_lowestSeverity, m_issues[issueIndex].issueSeverity);
+            filteredIssues.emplace_back(m_issues[issueIndex]);
+            ++issueIndex;
+        }
+    }
+
+    m_issues.swap(filteredIssues);
+}
 
 } // namespace lint

@@ -26,9 +26,9 @@ public:
         if (!ctx->returnExpr() || m_inArgsCount > 0 || m_inBlockCount == 0 || m_inNamedAssignCount == 0)
             return;
 
-        m_linter->addIssue({ IssueNumber::kMethodReturnInLexicalScope, IssueSeverity::kError,
-                             static_cast<int32_t>(ctx->returnExpr()->start->getLine()),
-                             static_cast<int32_t>(ctx->returnExpr()->start->getCharPositionInLine()) });
+        m_linter->addIssue({ IssueSeverity::kError, ctx->returnExpr()->start->getLine(),
+                             ctx->returnExpr()->start->getCharPositionInLine(), kOptionName,
+                             "avoid use of the method return operator (^) in named functions." });
     }
 
     void enterExprAssignDotName(sprklr::SCParser::ExprAssignDotNameContext*) override { ++m_inNamedAssignCount; }

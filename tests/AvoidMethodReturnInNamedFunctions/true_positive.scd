@@ -5,7 +5,7 @@ Function {
         var next = thread.exceptionHandler;
         thread.exceptionHandler = {|error|
             thread.exceptionHandler = next; // pop
-            ^error  //+//: 1,12
+            ^error  //+//: avoidMethodReturnInNamedFunctions,12
         };
         result = this.value;
         thread.exceptionHandler = next; // pop

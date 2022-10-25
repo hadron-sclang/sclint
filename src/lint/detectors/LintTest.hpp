@@ -32,29 +32,40 @@ public:
 private:
     void scanCommentTokens(const std::vector<antlr4::Token*>& tokens) {
         for (auto token : tokens) {
-            if (token->getType() == sprklr::SCParser::COMMENT_LINE) {
-                auto lineNumber = token->getLine();
-
-                auto commentString = token->toString();
-                auto start = commentString.find("//+//:");
-                if (start != commentString.npos) {
-                    start = start + sizeof("//+//:");
-                    // Expecting two numbers separted by a comma. First is error number, second is character number.
-                    char* endOfNumber = commentString.data() + start;
-                    size_t issueNumber = strtoul(endOfNumber, &endOfNumber, 10);
-                    size_t columnNumber = strtoul(endOfNumber + 1, nullptr, 10);
-                    if (issueNumber == 0 || columnNumber == 0) {
-                        m_linter->addIssue({ IssueNumber::kMalformedLintTestComment, IssueSeverity::kError,
-                                             static_cast<int32_t>(lineNumber),
-                                             static_cast<int32_t>(token->getCharPositionInLine()) });
-                    } else {
-                        m_linter->addExpectedIssue({ static_cast<IssueNumber>(issueNumber), IssueSeverity::kLint,
-                                                     static_cast<int32_t>(lineNumber),
-                                                     static_cast<int32_t>(columnNumber) });
-                    }
-                }
-            }
             m_tokenScanIndex = token->getTokenIndex() + 1;
+
+            // Expecting "//+//: detectorName, columnNumber"
+            if (token->getType() != sprklr::SCParser::COMMENT_LINE)
+                continue;
+
+            auto lineNumber = token->getLine();
+
+            auto commentString = token->toString();
+            auto start = commentString.find("//+//:");
+            if (start == commentString.npos)
+                continue;
+
+            start = start + sizeof("//+//:");
+
+            // Consume any whitespace before name.
+            while (commentString[start] == ' ' && start < commentString.size())
+                ++start;
+            auto comma = commentString.find(',', start);
+            if (comma == commentString.npos) {
+                m_linter->addIssue({ IssueSeverity::kError, lineNumber, token->getCharPositionInLine(), kOptionName,
+                                     "malformed lint test comment, missing comma." });
+                continue;
+            }
+
+            auto detectorName = commentString.substr(start, comma - start);
+            if (comma + 1 >= commentString.size()) {
+                m_linter->addIssue({ IssueSeverity::kError, lineNumber, token->getCharPositionInLine(), kOptionName,
+                                     "malformed lint test comment, missing column number after comma." });
+                continue;
+            }
+
+            size_t columnNumber = strtoul(commentString.data() + comma + 1, nullptr, 10);
+            m_linter->addExpectedIssue({ IssueSeverity::kLint, lineNumber, columnNumber, detectorName });
         }
     }
 

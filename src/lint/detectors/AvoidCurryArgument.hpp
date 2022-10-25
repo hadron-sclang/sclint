@@ -19,9 +19,9 @@ public:
     static constexpr bool kDefaultValue = false;
 
     void enterExprCurryArg(sprklr::SCParser::ExprCurryArgContext* ctx) override {
-        m_linter->addIssue({ IssueNumber::kAvoidCurryArgument, IssueSeverity::kWarning,
-                             static_cast<int32_t>(ctx->UNDERSCORE()->getSymbol()->getLine()),
-                             static_cast<int32_t>(ctx->UNDERSCORE()->getSymbol()->getCharPositionInLine()) });
+        m_linter->addIssue({ IssueSeverity::kWarning, ctx->UNDERSCORE()->getSymbol()->getLine(),
+                             ctx->UNDERSCORE()->getSymbol()->getCharPositionInLine(), kOptionName,
+                             "avoid use of the curry argument (_)." });
     }
 };
 
