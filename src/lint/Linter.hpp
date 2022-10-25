@@ -1,8 +1,8 @@
 #ifndef SRC_LINT_LINTER_HPP_
 #define SRC_LINT_LINTER_HPP_
 
-#include "detectors/Detector.hpp"
 #include "Issue.hpp"
+#include "ListenerMux.hpp"
 
 #include <memory>
 #include <string_view>
@@ -11,8 +11,8 @@
 
 namespace lint {
 
-struct Config;
-class DetectorMux;
+class Config;
+class ListenerMux;
 
 class Linter {
 public:
@@ -31,11 +31,13 @@ public:
     const std::string_view rewrittenString() const { return std::string_view(m_rewritten.data(), m_rewritten.size()); }
 
 private:
+    void filterExpectedIssues();
+
     const Config* m_config;
     std::string_view m_code;
     std::vector<Issue> m_issues;
     std::vector<Issue> m_expectedIssues;
-    DetectorMux m_mux;
+    ListenerMux m_mux;
     IssueSeverity m_lowestSeverity;
     std::string m_rewritten;
 };
