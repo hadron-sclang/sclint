@@ -7,41 +7,49 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 
-namespace {
-/*
-template<typename T>
-void setDefaults(lint::Config* config, T) {
-    config->setOptionNamed(T::kOptionName, T::kDefaultValue);
-}
-
-template<typename T, typename... Ts>
-void setDefaults(lint::Config* config, T, Ts... ts) {
-    config->setOptionNamed(T::kOptionName, T::kDefaultValue);
-    setDefaults(config, ts...);
-}
-*/
-
-template<typename T>
-void setDefault(lint::Config* config) {
-    config->setOptionNamed(T::kOptionName, T::kDefaultValue);
-}
-
-template<typename T, typename... Ts>
-void setDefaults<lint::TypeList<T, Ts>>(lint::Config* config) {
-    setDefault<T>(config);
-    setDefaults<Ts...>(config);
-}
-
-template<>
-void setDefaults<lint::TypeList<>>(lint::Config*) { }
-
-} // namespace
-
 namespace lint {
 
-void Config::initDefaults() {
-    setDefaults<DetectorList>(this);
-}
+template <typename T> struct TypeList<T> {
+    static void setDefaults(Config* config) { config->setOptionNamed(T::kOptionName, T::kDefaultValue); }
+
+    static std::string readJSON(Config* config, rapidjson::Document& document) {
+        if (document.HasMember(T::kOptionName)) {
+            if (!document[T::kOptionName].IsBool()) {
+                return std::string(T::kOptionName) + " not a boolean value.";
+            }
+            config->setOptionNamed(T::kOptionName, document[T::kOptionName].GetBool());
+        }
+        return "";
+    }
+
+    static void writeJSON(const Config* config, rapidjson::Document& document) {
+        rapidjson::Value optionName;
+        optionName.SetString(T::kOptionName, document.GetAllocator());
+        document.AddMember(optionName, rapidjson::Value(config->getOptionNamed(T::kOptionName)),
+                           document.GetAllocator());
+    }
+};
+
+template <typename T, typename... Ts> struct TypeList {
+    static void setDefaults(Config* config) {
+        TypeList<T>::setDefaults(config);
+        TypeList<Ts...>::setDefaults(config);
+    }
+
+    static std::string readJSON(Config* config, rapidjson::Document& document) {
+        auto result = TypeList<T>::readJSON(config, document);
+        if (result != "")
+            return result;
+        return TypeList<Ts...>::readJSON(config, document);
+    }
+
+    static void writeJSON(const Config* config, rapidjson::Document& document) {
+        TypeList<T>::writeJSON(config, document);
+        TypeList<Ts...>::writeJSON(config, document);
+    }
+};
+
+void Config::initDefaults() { DetectorList::setDefaults(this); }
 
 std::string Config::readJSON(std::string_view jsonString) {
     rapidjson::Document document;
@@ -54,59 +62,29 @@ std::string Config::readJSON(std::string_view jsonString) {
     if (!document.IsObject())
         return "input JSON is not a dictionary.";
 
-    if (document.HasMember(kOneNewlineAtEndOfFileName)) {
-        if (!document[kOneNewlineAtEndOfFileName].IsBool())
-            return std::string(kOneNewlineAtEndOfFileName) + " not a boolean value.";
-        oneNewlineAtEndOfFile = document[kOneNewlineAtEndOfFileName].GetBool();
-    }
-
-    if (document.HasMember(kNoMethodReturnWithLexicalScopeName)) {
-        if (!document[kNoMethodReturnWithLexicalScopeName].IsBool())
-            return std::string(kNoMethodReturnWithLexicalScopeName) + " not a boolean value.";
-        noMethodReturnWithLexicalScope = document[kNoMethodReturnWithLexicalScopeName].GetBool();
-    }
-
-    if (document.HasMember(kWarnOnCurryArgumentName)) {
-        if (!document[kWarnOnCurryArgumentName].IsBool())
-            return std::string(kWarnOnCurryArgumentName) + " not a boolean value.";
-        warnOnCurryArgument = document[kWarnOnCurryArgumentName].GetBool();
-    }
-
-    if (document.HasMember(kLintTestName)) {
-        if (!document[kLintTestName].IsBool())
-            return std::string(kLintTestName) + " not a boolean value.";
-        lintTest = document[kLintTestName].GetBool();
-    }
-
-    return "";
+    return DetectorList::readJSON(this, document);
 }
 
 std::string Config::writeJSON() const {
     rapidjson::Document document;
     document.SetObject();
-    auto& alloc = document.GetAllocator();
 
-    rapidjson::Value oneNewlineAtEndOfFileString;
-    oneNewlineAtEndOfFileString.SetString(kOneNewlineAtEndOfFileName, alloc);
-    document.AddMember(oneNewlineAtEndOfFileString, rapidjson::Value(oneNewlineAtEndOfFile), alloc);
-
-
-    rapidjson::Value noMethodReturnWithLexicalScopeString;
-    noMethodReturnWithLexicalScopeString.SetString(kNoMethodReturnWithLexicalScopeName, alloc);
-    document.AddMember(noMethodReturnWithLexicalScopeString, rapidjson::Value(noMethodReturnWithLexicalScope), alloc);
-
-    rapidjson::Value warnOnCurryArgumentString;
-    warnOnCurryArgumentString.SetString(kWarnOnCurryArgumentName, alloc);
-    document.AddMember(warnOnCurryArgumentString, rapidjson::Value(warnOnCurryArgument), alloc);
-
-    rapidjson::Value noLintTestString;
-    noLintTestString.SetString(kLintTestName, alloc);
-    document.AddMember(noLintTestString, rapidjson::Value(lintTest), alloc);
+    DetectorList::writeJSON(this, document);
 
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     document.Accept(writer);
     return buffer.GetString();
 }
+
+bool Config::getOptionNamed(const std::string& name) const {
+    auto optionIter = m_options.find(name);
+    if (optionIter != m_options.end())
+        return optionIter->second;
+    assert(false && "Lookup of option failed.");
+    return false;
+}
+
+void Config::setOptionNamed(const std::string& name, bool value) { m_options[name] = value; }
 
 } // namespace lint

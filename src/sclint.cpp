@@ -1,4 +1,5 @@
 #include "lint/Config.hpp"
+#include "lint/detectors/Detector.hpp"
 #include "lint/Linter.hpp"
 
 #include "fmt/format.h"

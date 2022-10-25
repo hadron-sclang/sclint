@@ -11,9 +11,12 @@ namespace lint {
 class LintTest : public Detector {
 public:
     LintTest() = delete;
-    LintTest(Linter* linter, antlr4::TokenStreamRewriter* rewriter, antlr4::CommonTokenStream* tokens):
-        Detector(linter, rewriter), m_tokens(tokens), m_tokenScanIndex(0) { }
+    LintTest(Linter* linter, antlr4::CommonTokenStream* tokens, antlr4::TokenStreamRewriter* rewriter):
+        Detector(linter, tokens, rewriter), m_tokenScanIndex(0) { }
     virtual ~LintTest() = default;
+
+    static constexpr const char* kOptionName = "lintTest";
+    static constexpr bool kDefaultValue = false;
 
     void visitTerminal(antlr4::tree::TerminalNode* node) override {
         auto tokenIndex = node->getSymbol()->getTokenIndex();
@@ -55,7 +58,6 @@ private:
         }
     }
 
-    antlr4::CommonTokenStream* m_tokens;
     size_t m_tokenScanIndex;
 };
 

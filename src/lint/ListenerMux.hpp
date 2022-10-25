@@ -25,7 +25,7 @@ public:
     void exitEveryRule(antlr4::ParserRuleContext* ctx) override;
 
 private:
-    std::vector<Detector*> m_detectors;
+    std::vector<std::unique_ptr<Detector>> m_detectors;
 };
 
 } // namespace lint

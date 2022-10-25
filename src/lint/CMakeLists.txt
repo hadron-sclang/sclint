@@ -4,13 +4,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 #############
 # lint
 add_library(lint STATIC
-    Config.cpp
-    Config.hpp
+    # TODO: Add new detectors to this list here in alphabetical order
     detectors/Detector.hpp
+    detectors/ExampleDetector.hpp
+    detectors/OneNewlineAtEndOfFile.hpp
+
     detectors/LintTest.hpp
     detectors/MethodReturnLexicalScope.hpp
     detectors/WarnOnCurryArgument.hpp
 
+    Config.cpp
+    Config.hpp
     Issue.hpp
     ListenerMux.cpp
     ListenerMux.hpp

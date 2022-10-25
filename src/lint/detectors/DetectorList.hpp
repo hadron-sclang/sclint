@@ -2,15 +2,15 @@
 #define SRC_LINT_DETECTORS_DETECTOR_LIST_HPP_
 
 #include "detectors/ExampleDetector.hpp"
+#include "detectors/LintTest.hpp"
+#include "detectors/OneNewlineAtEndOfFile.hpp"
 
 namespace lint {
 
-template <typename ...Ts>
-struct TypeList { };
+template <typename T, typename... Ts> struct TypeList;
 
-using DetectorList = TypeList<
-    ExampleDetector
->;
+
+using DetectorList = TypeList<ExampleDetector, LintTest, OneNewlineAtEndOfFile>;
 
 } // namespace lint
 

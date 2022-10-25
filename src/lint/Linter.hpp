@@ -11,7 +11,7 @@
 
 namespace lint {
 
-struct Config;
+class Config;
 class ListenerMux;
 
 class Linter {
