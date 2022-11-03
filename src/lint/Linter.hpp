@@ -4,6 +4,10 @@
 #include "Issue.hpp"
 #include "ListenerMux.hpp"
 
+#ifdef EMSCRIPTEN
+#    include <emscripten/bind.h>
+#endif
+
 #include <memory>
 #include <string_view>
 #include <string>
@@ -16,31 +20,38 @@ class ListenerMux;
 
 class Linter {
 public:
-    Linter() = delete;
-    Linter(const Config* config, std::string_view code);
+    Linter();
     ~Linter() = default;
 
     // Returns the most severe linter issue encountered.
-    IssueSeverity lint();
+    IssueSeverity lint(const Config& config, std::string_view code);
 
-    void addIssue(Issue&& issue);
-    void addExpectedIssue(Issue&& issue);
-
-    const Config* config() { return m_config; }
     const std::vector<Issue>& issues() const { return m_issues; }
     const std::string_view rewrittenString() const { return std::string_view(m_rewritten.data(), m_rewritten.size()); }
+
+    // Detector API
+    void addIssue(Issue&& issue);
+    void addExpectedIssue(Issue&& issue);
 
 private:
     void filterExpectedIssues();
 
-    const Config* m_config;
-    std::string_view m_code;
     std::vector<Issue> m_issues;
     std::vector<Issue> m_expectedIssues;
     ListenerMux m_mux;
     IssueSeverity m_lowestSeverity;
     std::string m_rewritten;
 };
+
+#ifdef EMSCRIPTEN
+EMSCRIPTEN_BINDINGS(sclint_linter_binding) {
+    emscripten::class_<Linter>("Linter")
+        .constructor()
+        .function("lint", &Linter::lint)
+        .function("issues", &Linter::issues)
+        .function("rewrittenString", &Linter::rewrittenString);
+}
+#endif
 
 } // namespace lint
 

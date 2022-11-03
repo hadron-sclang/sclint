@@ -27,5 +27,5 @@ jobs:
       - name: build
         run: |
           cd $BUILD_PATH
-          cmake --build .
+          cmake --build . --target=lint.js
 

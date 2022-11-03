@@ -1,6 +1,10 @@
 #ifndef SRC_LINT_CONFIG_HPP_
 #define SRC_LINT_CONFIG_HPP_
 
+#ifdef EMSCRIPTEN
+#    include <emscripten/bind.h>
+#endif
+
 #include <string_view>
 #include <string>
 #include <unordered_map>
@@ -30,6 +34,18 @@ private:
     std::unordered_map<std::string, bool> m_options;
 };
 
-} // namespace sclint
+#ifdef EMSCRIPTEN
+EMSCRIPTEN_BINDINGS(sclint_config_binding) {
+    emscripten::class_<Config>("Config")
+        .constructor()
+        .function("initDefaults", &Config::initDefaults)
+        .function("readJSON", &Config::readJSON)
+        .function("writeJSON", &Config::writeJSON)
+        .function("getOptionNamed", &Config::getOptionNamed)
+        .function("setOptionNamed", &Config::setOptionNamed);
+}
+#endif
+
+} // namespace lint
 
 #endif // SRC_LINT_CONFIG_HPP_

@@ -47,3 +47,10 @@ target_compile_options(lint PRIVATE
      $<$<CXX_COMPILER_ID:MSVC>:
      /W4 /WX /DNOMINMAX>
 )
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+find_program(EMCC_BINARY emcc REQUIRED)
+add_custom_target(lint.js
+                  COMMAND ${EMCC_BINARY} -lembind -o lint.js --whole-archive liblint.a
+                  DEPENDS lint)
+endif()

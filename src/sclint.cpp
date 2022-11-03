@@ -101,8 +101,8 @@ int main(int argc, char* argv[]) {
     if (!code)
         return -1;
 
-    lint::Linter linter(&config, std::string_view(code.get(), codeSize));
-    auto severity = linter.lint();
+    lint::Linter linter;
+    auto severity = linter.lint(config, std::string_view(code.get(), codeSize));
     if (severity == lint::IssueSeverity::kFatal) {
         std::cerr << fmt::format("{} had fatal parsing errors\n", fileName);
         return -1;
