@@ -1,4 +1,0 @@
-{
-    "lintTest": true,
-    "noMethodReturnWithLexicalScope": true
-}
