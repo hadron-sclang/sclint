@@ -21,6 +21,8 @@ add_library(lint STATIC
     Linter.hpp
 )
 
+target_compile_definitions(lint PUBLIC ANTLR4CPP_STATIC)
+
 target_link_libraries(lint
     fmt
     sprklr
@@ -35,8 +37,6 @@ if(WIN32)
     set_property(TARGET lint PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
     )
-    # required if linking to static library
-    target_compile_definitions(lint PUBLIC ANTLR4CPP_STATIC)
     # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
     set(ANTLR4_WITH_STATIC_CRT OFF)
 endif()
@@ -49,6 +49,7 @@ target_compile_options(lint PRIVATE
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+target_link_libraries(lint embind)
 find_program(EMCC_BINARY emcc REQUIRED)
 add_custom_target(lint.js
                   COMMAND ${EMCC_BINARY} -lembind -o lint.js --whole-archive liblint.a

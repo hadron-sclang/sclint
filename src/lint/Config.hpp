@@ -34,18 +34,18 @@ private:
     std::unordered_map<std::string, bool> m_options;
 };
 
-#ifdef EMSCRIPTEN
-EMSCRIPTEN_BINDINGS(sclint_config_binding) {
-    emscripten::class_<Config>("Config")
-        .constructor()
-        .function("initDefaults", &Config::initDefaults)
-        .function("readJSON", &Config::readJSON)
-        .function("writeJSON", &Config::writeJSON)
-        .function("getOptionNamed", &Config::getOptionNamed)
-        .function("setOptionNamed", &Config::setOptionNamed);
-}
-#endif
-
 } // namespace lint
+
+#ifdef EMSCRIPTEN
+EMSCRIPTEN_BINDINGS(Module) {
+    emscripten::class_<lint::Config>("Config")
+        .constructor()
+        .function("initDefaults", &lint::Config::initDefaults)
+        .function("readJSON", &lint::Config::readJSON)
+        .function("writeJSON", &lint::Config::writeJSON)
+        .function("getOptionNamed", &lint::Config::getOptionNamed)
+        .function("setOptionNamed", &lint::Config::setOptionNamed);
+}
+#endif // EMSCRIPTEN
 
 #endif // SRC_LINT_CONFIG_HPP_
