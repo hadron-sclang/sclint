@@ -51,7 +51,16 @@ target_compile_options(lint PRIVATE
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
 target_link_libraries(lint embind)
 find_program(EMCC_BINARY emcc REQUIRED)
+find_program(EMCXX_BINARY em++ REQUIRED)
+add_custom_command(OUTPUT Embind.cpp.o
+    COMMAND ${EMCXX_BINARY} -c ${CMAKE_CURRENT_SOURCE_DIR}/Embind.cpp -o Embind.cpp.o
+    DEPENDS Embind.cpp lint
+)
 add_custom_target(lint.js
-                  COMMAND ${EMCC_BINARY} -lembind -o lint.js --whole-archive liblint.a
-                  DEPENDS lint)
+                  COMMAND ${EMCC_BINARY} -lembind -o lint.js Embind.cpp.o --whole-archive liblint.a
+                        ${CMAKE_BINARY_DIR}/third_party/fmt/libfmt.a
+                        ${CMAKE_BINARY_DIR}/third_party/sparkler/grammar/libsprklr.a
+                        ${CMAKE_BINARY_DIR}/third_party/sparkler/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/libantlr4-runtime.a
+                        --no-whole-archive
+                  DEPENDS lint Embind.cpp.o)
 endif()

@@ -1,11 +1,6 @@
 #ifndef SRC_LINT_CONFIG_HPP_
 #define SRC_LINT_CONFIG_HPP_
 
-#ifdef EMSCRIPTEN
-#    include <emscripten/bind.h>
-#endif
-
-#include <string_view>
 #include <string>
 #include <unordered_map>
 
@@ -22,7 +17,7 @@ public:
     void initDefaults();
 
     // Returns an empty string on success or an error message if the JSON didn't parse correctly.
-    std::string readJSON(std::string_view jsonString);
+    std::string readJSON(const std::string& jsonString);
 
     // Returns a JSON string of the options.
     std::string writeJSON() const;
@@ -35,17 +30,5 @@ private:
 };
 
 } // namespace lint
-
-#ifdef EMSCRIPTEN
-EMSCRIPTEN_BINDINGS(Module) {
-    emscripten::class_<lint::Config>("Config")
-        .constructor()
-        .function("initDefaults", &lint::Config::initDefaults)
-        .function("readJSON", &lint::Config::readJSON)
-        .function("writeJSON", &lint::Config::writeJSON)
-        .function("getOptionNamed", &lint::Config::getOptionNamed)
-        .function("setOptionNamed", &lint::Config::setOptionNamed);
-}
-#endif // EMSCRIPTEN
 
 #endif // SRC_LINT_CONFIG_HPP_

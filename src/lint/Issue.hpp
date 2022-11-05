@@ -1,10 +1,6 @@
 #ifndef SRC_LINT_ISSUE_HPP_
 #define SRC_LINT_ISSUE_HPP_
 
-#ifdef EMSCRIPTEN
-#    include <emscripten/bind.h>
-#endif
-
 #include <cstdlib>
 #include <string>
 
@@ -42,24 +38,6 @@ struct Issue {
     std::string detectorName;
     std::string message; // optional message
 };
-
-#ifdef EMSCRIPTEN
-EMSCRIPTEN_BINDINGS(sclint_issue_binding) {
-    emscripten::enum_<IssueSeverity>("IssueSeverity")
-        .value("kFatal", IssueSeverity::kFatal)
-        .value("kError", IssueSeverity::kError)
-        .value("kWarning", IssueSeverity::kWarning)
-        .value("kLint", IssueSeverity::kLint)
-        .value("kNote", IssueSeverity::kNote)
-        .value("kNone", IssueSeverity::kNone);
-
-    emscripten::value_object<Issue>("Issue")
-        .field("issueSeverity", &Issue::issueSeverity)
-        .field("columnNumber", &Issue::columnNumber)
-        .field("detectorName", &Issue::detectorName)
-        .field("message", &Issue::message);
-}
-#endif
 
 } // namespace lint
 
