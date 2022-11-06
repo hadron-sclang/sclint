@@ -1,5 +1,5 @@
 #ifndef EMSCRIPTEN
-#error "This file is for Emscripten builds only"
+#    error "This file is for Emscripten builds only"
 #endif
 
 #include "Config.hpp"
@@ -27,6 +27,7 @@ EMSCRIPTEN_BINDINGS(Module) {
 
     emscripten::value_object<lint::Issue>("Issue")
         .field("issueSeverity", &lint::Issue::issueSeverity)
+        .field("lineNumber", &lint::Issue::lineNumber)
         .field("columnNumber", &lint::Issue::columnNumber)
         .field("detectorName", &lint::Issue::detectorName)
         .field("message", &lint::Issue::message);

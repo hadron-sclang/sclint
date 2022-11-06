@@ -23,13 +23,23 @@ foreach(TEST_DIR ${SCLINT_TEST_DIRS})
     foreach(TEST_FILE ${TEST_SCDS})
         # if there's a reference file, check against it
         if(EXISTS "${TEST_FILE}.ref")
-            set(CHECK_AGAINST "--checkAgainst=${TEST_FILE}.ref")
+            set(CHECK_AGAINST "--checkAgainst" "${TEST_FILE}.ref")
         else()
             set(CHECK_AGAINST "")
         endif()
 
-        add_test(NAME ${TEST_FILE} COMMAND
-            sclint "--style={\"lintTest\": true, \"${TEST_DIR}\": true}" ${CHECK_AGAINST} "${TEST_FILE}"
-        )
+        if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+            add_test(NAME ${TEST_FILE} COMMAND
+                ${PROJECT_SOURCE_DIR}/sclint-js/sclint.js --style "{\"lintTest\": true, \"${TEST_DIR}\": true}"
+                    ${CHECK_AGAINST} "${TEST_FILE}"
+            )
+            set_tests_properties(${TEST_FILE} PROPERTIES
+                ENVIRONMENT "NODE_PATH=${CMAKE_BINARY_DIR}/src/lint"
+            )
+        else()
+            add_test(NAME ${TEST_FILE} COMMAND
+                sclint "--style={\"lintTest\": true, \"${TEST_DIR}\": true}" ${CHECK_AGAINST} "${TEST_FILE}"
+            )
+        endif()
     endforeach()
 endforeach()

@@ -12,7 +12,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes ninja-build cmake build-essential gcc emscripten
+          sudo apt-get install --yes ninja-build cmake build-essential gcc emscripten node
           mkdir -p $BUILD_PATH/install-ext/{lib,bin}
           cd $BUILD_PATH/install-ext/lib
           curl -O https://www.antlr.org/download/antlr-4.11.1-complete.jar
@@ -28,4 +28,7 @@ jobs:
         run: |
           cd $BUILD_PATH
           cmake --build . --target=lint.js
-
+      - name: test
+        run: |
+          cd $BUILD_PATH
+          ctest -C Debug -T test --output-on-failure

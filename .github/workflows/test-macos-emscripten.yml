@@ -11,7 +11,7 @@ jobs:
           submodules: recursive
       - name: install dependencies
         run: |
-          brew install cmake bison antlr emscripten
+          brew install cmake bison antlr emscripten node
       - name: configure
         run: |
           mkdir $BUILD_PATH && cd $BUILD_PATH
@@ -20,4 +20,7 @@ jobs:
         run: |
           cd $BUILD_PATH
           cmake --build . --target=lint.js
-
+      - name: test
+        run: |
+          cd $BUILD_PATH
+          ctest -C Debug -T test --output-on-failure
