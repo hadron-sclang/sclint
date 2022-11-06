@@ -1,7 +1,6 @@
 #ifndef SRC_LINT_CONFIG_HPP_
 #define SRC_LINT_CONFIG_HPP_
 
-#include <string_view>
 #include <string>
 #include <unordered_map>
 
@@ -18,7 +17,7 @@ public:
     void initDefaults();
 
     // Returns an empty string on success or an error message if the JSON didn't parse correctly.
-    std::string readJSON(std::string_view jsonString);
+    std::string readJSON(const std::string& jsonString);
 
     // Returns a JSON string of the options.
     std::string writeJSON() const;
@@ -30,6 +29,6 @@ private:
     std::unordered_map<std::string, bool> m_options;
 };
 
-} // namespace sclint
+} // namespace lint
 
 #endif // SRC_LINT_CONFIG_HPP_

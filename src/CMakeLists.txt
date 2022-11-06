@@ -4,6 +4,8 @@ set(CXX_EXTENSIONS OFF)
 
 add_subdirectory(lint)
 
+# sclint binary not included in the WASM build.
+if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
 #############
 # sclint
 add_executable(sclint
@@ -22,3 +24,4 @@ target_compile_options(sclint PRIVATE
      $<$<CXX_COMPILER_ID:MSVC>:
      /W4 /WX /DNOMINMAX>
 )
+endif()

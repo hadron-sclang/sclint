@@ -51,7 +51,7 @@ template <typename T, typename... Ts> struct TypeList {
 
 void Config::initDefaults() { DetectorList::setDefaults(this); }
 
-std::string Config::readJSON(std::string_view jsonString) {
+std::string Config::readJSON(const std::string& jsonString) {
     rapidjson::Document document;
     rapidjson::ParseResult parseResult = document.Parse(jsonString.data());
 

@@ -1,4 +1,5 @@
 .cache
 .vscode
-build/
+build*
+sclint-js/node_modules
 

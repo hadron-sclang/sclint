@@ -11,16 +11,16 @@
 namespace lint {
 
 template <typename T> struct TypeList<T> {
-    static void addDetectors(const Config* config, ListenerMux* mux, Linter* linter, antlr4::CommonTokenStream* tokens,
+    static void addDetectors(const Config& config, ListenerMux* mux, Linter* linter, antlr4::CommonTokenStream* tokens,
                              antlr4::TokenStreamRewriter* rewriter) {
-        if (config->getOptionNamed(T::kOptionName)) {
+        if (config.getOptionNamed(T::kOptionName)) {
             mux->addDetector(std::make_unique<T>(linter, tokens, rewriter));
         }
     }
 };
 
 template <typename T, typename... Ts> struct TypeList {
-    static void addDetectors(const Config* config, ListenerMux* mux, Linter* linter, antlr4::CommonTokenStream* tokens,
+    static void addDetectors(const Config& config, ListenerMux* mux, Linter* linter, antlr4::CommonTokenStream* tokens,
                              antlr4::TokenStreamRewriter* rewriter) {
         TypeList<T>::addDetectors(config, mux, linter, tokens, rewriter);
         TypeList<Ts...>::addDetectors(config, mux, linter, tokens, rewriter);
@@ -28,11 +28,10 @@ template <typename T, typename... Ts> struct TypeList {
 };
 
 
-Linter::Linter(const Config* config, std::string_view code):
-    m_config(config), m_code(code), m_lowestSeverity(IssueSeverity::kNone) { }
+Linter::Linter(): m_lowestSeverity(IssueSeverity::kNone) { }
 
-IssueSeverity Linter::lint() {
-    antlr4::ANTLRInputStream input(m_code.data(), m_code.size());
+IssueSeverity Linter::lint(const Config& config, const std::string& code) {
+    antlr4::ANTLRInputStream input(code.data(), code.size());
     sprklr::SCLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
     antlr4::TokenStreamRewriter rewriter(&tokens);
@@ -42,18 +41,18 @@ IssueSeverity Linter::lint() {
         return IssueSeverity::kFatal; // TODO: relay parse errors to user?
     }
 
-    m_mux.clearDetectors();
+    ListenerMux mux;
 
-    DetectorList::addDetectors(m_config, &m_mux, this, &tokens, &rewriter);
+    DetectorList::addDetectors(config, &mux, this, &tokens, &rewriter);
 
     // Walk the parser tree with all detectors installed in the multiplexer.
-    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&m_mux, parser.root());
+    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&mux, parser.root());
 
     // Sort the issues by line and column number.
     std::sort(m_issues.begin(), m_issues.end());
 
     // If testing is enabled, compare the list of expected issues to actual issues, and treat differences as an error.
-    if (m_config->getOptionNamed(LintTest::kOptionName))
+    if (config.getOptionNamed(LintTest::kOptionName))
         filterExpectedIssues();
 
     m_rewritten = rewriter.getText();

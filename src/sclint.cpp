@@ -1,5 +1,4 @@
 #include "lint/Config.hpp"
-#include "lint/detectors/Detector.hpp"
 #include "lint/Linter.hpp"
 
 #include "fmt/format.h"
@@ -67,7 +66,7 @@ int main(int argc, char* argv[]) {
         auto configFile = readFile(configPath.string(), configFileSize);
         if (!configFile)
             return -1;
-        auto results = config.readJSON(std::string_view(configFile.get(), configFileSize));
+        auto results = config.readJSON(std::string(configFile.get(), configFileSize));
         if (results != "") {
             std::cerr << fmt::format("Failed to read JSON .sclint file at '{}': {}\n", configPath.string(), results);
             return -1;
@@ -101,8 +100,8 @@ int main(int argc, char* argv[]) {
     if (!code)
         return -1;
 
-    lint::Linter linter(&config, std::string_view(code.get(), codeSize));
-    auto severity = linter.lint();
+    lint::Linter linter;
+    auto severity = linter.lint(config, std::string(code.get(), codeSize));
     if (severity == lint::IssueSeverity::kFatal) {
         std::cerr << fmt::format("{} had fatal parsing errors\n", fileName);
         return -1;

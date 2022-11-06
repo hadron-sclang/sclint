@@ -1,0 +1,28 @@
+name: test-macos-emscripten
+on: [push, pull_request]
+jobs:
+  test-macos-emscripten:
+    runs-on: macos-latest
+    env:
+      BUILD_PATH: ${{ github.workspace }}/build
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: install dependencies
+        run: |
+          brew install cmake bison antlr emscripten node
+          cd sclint-js
+          npm install
+      - name: configure
+        run: |
+          mkdir $BUILD_PATH && cd $BUILD_PATH
+          emcmake cmake ..
+      - name: build
+        run: |
+          cd $BUILD_PATH
+          cmake --build . --target=lint.js
+      - name: test
+        run: |
+          cd $BUILD_PATH
+          ctest -C Debug -T test --output-on-failure
