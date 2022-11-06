@@ -11,7 +11,7 @@ jobs:
           submodules: recursive
       - name: install dependencies
         run: |
-          brew install cmake bison antlr emscripten nodejs
+          brew install cmake bison antlr emscripten node
           cd sclint-js
           npm install
       - name: configure

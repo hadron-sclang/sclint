@@ -12,7 +12,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes ninja-build cmake build-essential gcc emscripten node
+          sudo apt-get install --yes ninja-build cmake build-essential gcc emscripten nodejs
           cd sclint-js
           npm install
           mkdir -p $BUILD_PATH/install-ext/{lib,bin}
