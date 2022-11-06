@@ -13,6 +13,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes ninja-build cmake build-essential gcc emscripten node
+          cd sclint-js
+          npm install
           mkdir -p $BUILD_PATH/install-ext/{lib,bin}
           cd $BUILD_PATH/install-ext/lib
           curl -O https://www.antlr.org/download/antlr-4.11.1-complete.jar
