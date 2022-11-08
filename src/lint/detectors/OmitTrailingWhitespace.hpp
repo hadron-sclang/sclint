@@ -53,11 +53,12 @@ public:
                 while (newlineStart != std::string::npos) {
                     // Search left of the newline for any whitespace.
                     int printingStart = static_cast<int>(newlineStart) - 1;
-                    for (; printingStart >= 0; --printingStart) {
+                    for (; printingStart >= static_cast<int>(copyPosition); --printingStart) {
                         if (commentString[printingStart] != ' ' && commentString[printingStart] != '\t')
                             break;
                     }
-                    if (printingStart >= 0 && printingStart < static_cast<int>(newlineStart) - 1) {
+                    if (printingStart >= static_cast<int>(copyPosition) &&
+                        printingStart < static_cast<int>(newlineStart) - 1) {
                         rewrite = true;
                         rewrittenString.append(commentString.substr(copyPosition, printingStart - copyPosition + 1));
                         m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line,
@@ -72,7 +73,11 @@ public:
 
                     if (newlineStart + 1 >= commentString.size())
                         break;
-                    newlineStart = commentString.find_first_of("\r\n", newlineStart + 1);
+
+                    if (commentString[newlineStart] == '\r')
+                        newlineStart = commentString.find_first_of("\r", newlineStart + 1);
+                    else
+                        newlineStart = commentString.find_first_of("\n", newlineStart + 1);
                 }
 
                 if (rewrite) {
