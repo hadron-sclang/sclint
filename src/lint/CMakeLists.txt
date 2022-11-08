@@ -10,6 +10,7 @@ add_library(lint STATIC
     detectors/Detector.hpp
     detectors/ExampleDetector.hpp
     detectors/LintTest.hpp
+    detectors/OmitTrailingWhitespace.hpp
     detectors/OneNewlineAtEndOfFile.hpp
 
     Config.cpp

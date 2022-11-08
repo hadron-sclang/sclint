@@ -14,6 +14,7 @@
 // TODO: Please add tests!
 
 #include "detectors/Detector.hpp"
+#include "Linter.hpp"
 
 namespace lint {
 

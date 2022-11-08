@@ -20,7 +20,6 @@ program
 program.parse();
 
 const options = program.opts();
-console.log(options);
 
 if (program.args.length != 1) {
     console.error("Error: missing input file argument");
