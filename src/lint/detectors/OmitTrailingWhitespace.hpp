@@ -70,11 +70,9 @@ public:
                     ++line;
                     charPosition = 0;
 
-                    // Skip over the newline assumed to be the next character in the stream.
-                    if (commentString[newlineStart] == '\r')
-                        newlineStart = commentString.find_first_of("\r\n", newlineStart + 2);
-                    else
-                        newlineStart = commentString.find_first_of("\n", newlineStart + 1);
+                    if (newlineStart + 1 >= commentString.size())
+                        break;
+                    newlineStart = commentString.find_first_of("\r\n", newlineStart + 1);
                 }
 
                 if (rewrite) {
