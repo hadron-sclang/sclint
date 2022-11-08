@@ -57,8 +57,8 @@ public:
                         if (commentString[printingStart] != ' ' && commentString[printingStart] != '\t')
                             break;
                     }
-                    if (printingStart >= static_cast<int>(copyPosition) &&
-                        printingStart < static_cast<int>(newlineStart) - 1) {
+                    if (printingStart >= static_cast<int>(copyPosition)
+                        && printingStart < static_cast<int>(newlineStart) - 1) {
                         rewrite = true;
                         rewrittenString.append(commentString.substr(copyPosition, printingStart - copyPosition + 1));
                         m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line,
