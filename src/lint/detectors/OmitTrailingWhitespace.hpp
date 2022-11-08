@@ -39,52 +39,62 @@ public:
             }
 
             if (type == sprklr::SCParser::COMMENT_LINE || type == sprklr::SCParser::COMMENT_BLOCK) {
+                // Reset the newline flag as we found some printing characters on this line.
                 foundNewline = false;
-                // TODO: this awkward code results from not being able to use std::regex in the WASM build. If we
-                // end up adding a regex library that works in WASM, consider a refactor to use it here.
-                auto commentString = token->getText();
-                std::string rewrittenString;
-                size_t copyPosition = 0;
-                size_t line = 0;
-                size_t charPosition = token->getCharPositionInLine();
-                // There are zero or more newlines inside a block comment, and exactly one newline in a line comment.
-                auto newlineStart = commentString.find_first_of("\r\n");
-                bool rewrite = false;
-                while (newlineStart != std::string::npos) {
-                    // Search left of the newline for any whitespace.
-                    int printingStart = static_cast<int>(newlineStart) - 1;
-                    for (; printingStart >= static_cast<int>(copyPosition); --printingStart) {
-                        if (commentString[printingStart] != ' ' && commentString[printingStart] != '\t')
-                            break;
-                    }
-                    if (printingStart >= static_cast<int>(copyPosition)
-                        && printingStart < static_cast<int>(newlineStart) - 1) {
-                        rewrite = true;
-                        rewrittenString.append(commentString.substr(copyPosition, printingStart - copyPosition + 1));
-                        m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line,
-                                             charPosition + printingStart, kOptionName,
-                                             "removing whitespace at end of line within comment." });
-                        copyPosition = newlineStart;
-                    }
-
-                    // Increment line and reset character counter for next line.
-                    ++line;
-                    charPosition = 0;
-
-                    if (newlineStart + 1 >= commentString.size())
-                        break;
-
-                    if (commentString[newlineStart] == '\r')
-                        newlineStart = commentString.find_first_of("\r", newlineStart + 1);
-                    else
-                        newlineStart = commentString.find_first_of("\n", newlineStart + 1);
-                }
-
-                if (rewrite) {
-                    rewrittenString.append(commentString.substr(copyPosition));
-                    m_rewriter->replace(token->getTokenIndex(), rewrittenString);
-                }
+                rewriteComment(token);
             }
+        }
+    }
+
+private:
+    void rewriteComment(const antlr4::Token* token) {
+        // TODO: this awkward code results from not being able to use std::regex in the WASM build. If we
+        // end up adding a regex library that works in WASM, consider a refactor to use it here.
+        auto commentString = token->getText();
+        std::string rewrittenString;
+        size_t copyPosition = 0;
+        size_t line = 0;
+        size_t charPosition = token->getCharPositionInLine();
+        bool rewrite = false;
+
+        // There are zero or more newlines inside a block comment, and exactly one newline in a line comment.
+        auto newlineStart = commentString.find_first_of("\r\n");
+        while (newlineStart != std::string::npos) {
+            // We assume that a valid block or line comment could never start with a newline.
+            assert(newlineStart > 0);
+
+            // Search left of the newline for any whitespace.
+            int printingStart = static_cast<int>(newlineStart) - 1;
+            for (; printingStart >= static_cast<int>(copyPosition); --printingStart) {
+                if (commentString[printingStart] != ' ' && commentString[printingStart] != '\t')
+                    break;
+            }
+
+            if (printingStart >= static_cast<int>(copyPosition) &&
+                (printingStart < (static_cast<int>(newlineStart) - 1))) {
+                rewrite = true;
+                rewrittenString.append(commentString.substr(copyPosition, printingStart - copyPosition + 1));
+                m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line, charPosition + printingStart,
+                                     kOptionName, "removing whitespace at end of line within comment." });
+                copyPosition = newlineStart;
+            }
+
+            // Increment line and reset character counter for next line.
+            ++line;
+            charPosition = 0;
+
+            if (newlineStart + 1 >= commentString.size())
+                break;
+
+            if (commentString[newlineStart] == '\r')
+                newlineStart = commentString.find_first_of('\r', newlineStart + 1);
+            else
+                newlineStart = commentString.find_first_of('\n', newlineStart + 1);
+        }
+
+        if (rewrite) {
+            rewrittenString.append(commentString.substr(copyPosition));
+            m_rewriter->replace(token->getTokenIndex(), rewrittenString);
         }
     }
 };
