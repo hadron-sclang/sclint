@@ -22,7 +22,7 @@ public:
         // Look for whitespace tokens to the right of this one.
         auto whitespaceTokens = m_tokens->getHiddenTokensToRight(node->getSymbol()->getTokenIndex());
         // Moving from right to left, first identify a newline, then remove any whitespace left of that newline.
-//        bool foundNewline = false;
+        bool foundNewline = false;
         for (int i = static_cast<int>(whitespaceTokens.size()) - 1; i >= 0; --i) {
             const antlr4::Token* token = whitespaceTokens[i];
             assert(token);
