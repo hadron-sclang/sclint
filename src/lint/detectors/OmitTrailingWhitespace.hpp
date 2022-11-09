@@ -42,6 +42,7 @@ public:
             }
         }
 
+        std::reverse(toDelete.begin(), toDelete.end());
         for (auto idx : toDelete)
             m_rewriter->Delete(idx);
     }
