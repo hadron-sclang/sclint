@@ -18,7 +18,7 @@ public:
     static constexpr const char* kOptionName = "omitTrailingWhitespace";
     static constexpr bool kDefaultValue = true;
 
-    void visitTerminal(antlr4::tree::TerminalNode* node) override {
+    void visitTerminal(antlr4::tree::TerminalNode* /* node */) override {
 /*
         // Look for whitespace tokens to the right of this one.
         auto whitespaceTokens = m_tokens->getHiddenTokensToRight(node->getSymbol()->getTokenIndex());
