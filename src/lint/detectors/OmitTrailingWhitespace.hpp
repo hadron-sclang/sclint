@@ -23,7 +23,6 @@ public:
         auto whitespaceTokens = m_tokens->getHiddenTokensToRight(node->getSymbol()->getTokenIndex());
         // Moving from right to left, first identify a newline, then remove any whitespace left of that newline.
         bool foundNewline = false;
-        std::set<size_t> toDelete;
         for (int i = static_cast<int>(whitespaceTokens.size()) - 1; i >= 0; --i) {
             const antlr4::Token* token = whitespaceTokens[i];
             assert(token);
@@ -36,15 +35,16 @@ public:
                 rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
                 if (token->getTokenIndex() != INVALID_INDEX)
-                    toDelete.insert(token->getTokenIndex());
-//                m_rewriter->Delete(token->getTokenIndex()); HANGS 
+                    m_toDelete.insert(token->getTokenIndex());
                 m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
                                      kOptionName, "removing whitespace at end of line." });
             }
         }
+    }
 
-//        for (auto idx : toDelete)
-//            m_rewriter->Delete(idx);
+    void exitRoot(sprklr::SCParser::RootContext*) override {
+        for (auto idx : m_toDelete)
+            m_rewriter->Delete(idx);
     }
 
 private:
@@ -101,6 +101,8 @@ private:
             m_rewriter->replace(token->getTokenIndex(), rewrittenString);
         }
     }
+
+    std::set<size_t> m_toDelete;
 };
 
 } // namespace lint
