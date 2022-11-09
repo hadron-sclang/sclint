@@ -4,6 +4,8 @@
 #include "detectors/Detector.hpp"
 #include "Linter.hpp"
 
+#include <set>
+
 namespace lint {
 
 class OmitTrailingWhitespace : public Detector {
@@ -33,7 +35,8 @@ public:
                 rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
                 // Calling m_rewriter->Delete() here inexplicably hangs the program on Windows.
-                m_rewriter->replace(token->getTokenIndex(), "");
+//                m_rewriter->replace(token->getTokenIndex(), "");
+                m_toDelete.insert(token->getTokenIndex());
                 m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
                                      kOptionName, "removing whitespace at end of line." });
             }
@@ -94,6 +97,8 @@ private:
             m_rewriter->replace(token->getTokenIndex(), rewrittenString);
         }
     }
+
+    std::set<size_t> m_toDelete;
 };
 
 } // namespace lint
