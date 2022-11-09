@@ -38,7 +38,7 @@ public:
                 continue;
             }
 
-            if (type == sprklr::SCParser::COMMENT_LINE || type == sprklr::SCParser::COMMENT_BLOCK) {
+            if (type == sprklr::SCParser::COMMENT_LINE /* || type == sprklr::SCParser::COMMENT_BLOCK */) {
                 // Reset the newline flag as we found some printing characters on this line.
                 foundNewline = false;
                 rewriteComment(token);
@@ -54,7 +54,7 @@ private:
         std::string rewrittenString;
         size_t copyPosition = 0;
         size_t line = 0;
-        size_t charPosition = token->getCharPositionInLine();
+        size_t lastNewlineStart = 0;
         bool rewrite = false;
 
         // There are zero or more newlines inside a block comment, and exactly one newline in a line comment.
@@ -73,18 +73,21 @@ private:
             if (printingStart >= static_cast<int>(copyPosition) &&
                 (printingStart < (static_cast<int>(newlineStart) - 1))) {
                 rewrite = true;
+                size_t charPosition =
+                    line == 0 ? token->getCharPositionInLine() + printingStart : printingStart - lastNewlineStart;
                 rewrittenString.append(commentString.substr(copyPosition, printingStart - copyPosition + 1));
-                m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line, charPosition + printingStart,
-                                     kOptionName, "removing whitespace at end of line within comment." });
+                m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line, charPosition, kOptionName,
+                                     "removing whitespace at end of line within comment." });
                 copyPosition = newlineStart;
             }
 
-            // Increment line and reset character counter for next line.
+            // Increment line counter
             ++line;
-            charPosition = 0;
 
             if (newlineStart + 1 >= commentString.size())
                 break;
+
+            lastNewlineStart = newlineStart;
 
             if (commentString[newlineStart] == '\r')
                 newlineStart = commentString.find_first_of('\r', newlineStart + 1);
