@@ -24,7 +24,8 @@ public:
         // Moving from right to left, first identify a newline, then remove any whitespace left of that newline.
         bool foundNewline = false;
         for (int i = static_cast<int>(whitespaceTokens.size()) - 1; i >= 0; --i) {
-            const auto token = whitespaceTokens[i];
+            const antlr4::Token* token = whitespaceTokens[i];
+            assert(token);
             const auto type = token->getType();
             if (type == sprklr::SCParser::NEWLINE || type == sprklr::SCParser::CARRIAGE_RETURN) {
                 foundNewline = true;
@@ -34,8 +35,8 @@ public:
                 rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
                 m_rewriter->Delete(token->getTokenIndex());
-//                m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
-//                                     kOptionName, "removing whitespace at end of line." });
+                m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
+                                     kOptionName, "removing whitespace at end of line." });
             }
         }
     }
