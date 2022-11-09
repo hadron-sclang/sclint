@@ -50,7 +50,7 @@ private:
     void rewriteComment(const antlr4::Token* token) {
         // TODO: this awkward code results from not being able to use std::regex in the WASM build. If we
         // end up adding a regex library that works in WASM, consider a refactor to use it here.
-        auto commentString = token->getText();
+        const auto commentString = token->getText();
         std::string rewrittenString;
         size_t copyPosition = 0;
         size_t line = 0;
