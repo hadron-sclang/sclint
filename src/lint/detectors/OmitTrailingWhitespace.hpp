@@ -26,20 +26,18 @@ public:
         for (int i = static_cast<int>(whitespaceTokens.size()) - 1; i >= 0; --i) {
             const antlr4::Token* token = whitespaceTokens[i];
             assert(token);
-/*
             const auto type = token->getType();
             if (type == sprklr::SCParser::NEWLINE || type == sprklr::SCParser::CARRIAGE_RETURN) {
-                foundNewline = true;
+//                foundNewline = true;
             } else if (type == sprklr::SCParser::COMMENT_LINE || type == sprklr::SCParser::COMMENT_BLOCK) {
                 // Reset the newline flag as we found some printing characters on this line.
-                foundNewline = false;
-                rewriteComment(token);
+//                foundNewline = false;
+//                rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
-                m_rewriter->Delete(token->getTokenIndex());
-                m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
-                                     kOptionName, "removing whitespace at end of line." });
+//                m_rewriter->Delete(token->getTokenIndex());
+//                m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
+//                                     kOptionName, "removing whitespace at end of line." });
             }
-            */
         }
     }
 
