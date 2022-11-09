@@ -28,20 +28,14 @@ public:
             const auto type = token->getType();
             if (type == sprklr::SCParser::NEWLINE || type == sprklr::SCParser::CARRIAGE_RETURN) {
                 foundNewline = true;
-                continue;
-            }
-
-            if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
+/*            } else if (type == sprklr::SCParser::COMMENT_LINE || type == sprklr::SCParser::COMMENT_BLOCK) {
+                // Reset the newline flag as we found some printing characters on this line.
+                foundNewline = false;
+                rewriteComment(token); */
+            } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
                 m_rewriter->Delete(token->getTokenIndex());
                 m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
                                      kOptionName, "removing whitespace at end of line." });
-                continue;
-            }
-
-            if (/*type == sprklr::SCParser::COMMENT_LINE || */ type == sprklr::SCParser::COMMENT_BLOCK) {
-                // Reset the newline flag as we found some printing characters on this line.
-                foundNewline = false;
-                rewriteComment(token);
             }
         }
     }
