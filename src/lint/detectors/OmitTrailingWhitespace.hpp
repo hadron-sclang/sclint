@@ -4,7 +4,7 @@
 #include "detectors/Detector.hpp"
 #include "Linter.hpp"
 
-#include <regex>
+#include <set>
 
 namespace lint {
 
@@ -21,9 +21,9 @@ public:
     void visitTerminal(antlr4::tree::TerminalNode* node) override {
         // Look for whitespace tokens to the right of this one.
         auto whitespaceTokens = m_tokens->getHiddenTokensToRight(node->getSymbol()->getTokenIndex());
-        std::vector<size_t> toDelete;
         // Moving from right to left, first identify a newline, then remove any whitespace left of that newline.
         bool foundNewline = false;
+        std::set<size_t> toDelete;
         for (int i = static_cast<int>(whitespaceTokens.size()) - 1; i >= 0; --i) {
             const antlr4::Token* token = whitespaceTokens[i];
             assert(token);
@@ -35,14 +35,14 @@ public:
                 foundNewline = false;
                 rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
-                toDelete.push_back(token->getTokenIndex());
+                if (token->getTokenIndex() != INVALID_INDEX)
+                    toDelete.insert(token->getTokenIndex());
 //                m_rewriter->Delete(token->getTokenIndex()); HANGS 
                 m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
                                      kOptionName, "removing whitespace at end of line." });
             }
         }
 
-        std::reverse(toDelete.begin(), toDelete.end());
         for (auto idx : toDelete)
             m_rewriter->Delete(idx);
     }
