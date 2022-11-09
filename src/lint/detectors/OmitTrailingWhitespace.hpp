@@ -28,10 +28,10 @@ public:
             assert(token);
             const auto type = token->getType();
             if (type == sprklr::SCParser::NEWLINE || type == sprklr::SCParser::CARRIAGE_RETURN) {
-//                foundNewline = true;
+                foundNewline = true;
             } else if (type == sprklr::SCParser::COMMENT_LINE || type == sprklr::SCParser::COMMENT_BLOCK) {
                 // Reset the newline flag as we found some printing characters on this line.
-//                foundNewline = false;
+                foundNewline = false;
 //                rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
 //                m_rewriter->Delete(token->getTokenIndex());
