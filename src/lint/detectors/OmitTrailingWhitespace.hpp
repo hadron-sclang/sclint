@@ -43,8 +43,8 @@ public:
             }
         }
 
-        for (auto idx : toDelete)
-            m_rewriter->Delete(idx);
+//        for (auto idx : toDelete)
+//            m_rewriter->Delete(idx);
     }
 
 private:
