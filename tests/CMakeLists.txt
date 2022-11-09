@@ -15,6 +15,7 @@ include(CTest)
 set(SCLINT_TEST_DIRS
     avoidCurryArgument
     avoidMethodReturnInNamedFunctions
+    omitTrailingWhitespace
     oneNewlineAtEndOfFile
 )
 

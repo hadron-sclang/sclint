@@ -27,7 +27,6 @@ template <typename T, typename... Ts> struct TypeList {
     }
 };
 
-
 Linter::Linter(): m_lowestSeverity(IssueSeverity::kNone) { }
 
 IssueSeverity Linter::lint(const Config& config, const std::string& code) {
@@ -36,17 +35,17 @@ IssueSeverity Linter::lint(const Config& config, const std::string& code) {
     antlr4::CommonTokenStream tokens(&lexer);
     antlr4::TokenStreamRewriter rewriter(&tokens);
     sprklr::SCParser parser(&tokens);
-    if (parser.getNumberOfSyntaxErrors()) {
-        m_lowestSeverity = IssueSeverity::kFatal;
-        return IssueSeverity::kFatal; // TODO: relay parse errors to user?
-    }
 
     ListenerMux mux;
-
     DetectorList::addDetectors(config, &mux, this, &tokens, &rewriter);
 
     // Walk the parser tree with all detectors installed in the multiplexer.
     antlr4::tree::ParseTreeWalker::DEFAULT.walk(&mux, parser.root());
+
+    if (parser.getNumberOfSyntaxErrors()) {
+        m_lowestSeverity = IssueSeverity::kFatal;
+        return IssueSeverity::kFatal; // TODO: relay parse errors to user?
+    }
 
     // Sort the issues by line and column number.
     std::sort(m_issues.begin(), m_issues.end());

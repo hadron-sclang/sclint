@@ -6,6 +6,7 @@
 #include "detectors/AvoidMethodReturnInNamedFunctions.hpp"
 #include "detectors/ExampleDetector.hpp"
 #include "detectors/LintTest.hpp"
+#include "detectors/OmitTrailingWhitespace.hpp"
 #include "detectors/OneNewlineAtEndOfFile.hpp"
 
 namespace lint {
@@ -13,8 +14,8 @@ namespace lint {
 template <typename T, typename... Ts> struct TypeList;
 
 // TODO: add your detector class name to this list in alphabetical order.
-using DetectorList =
-    TypeList<AvoidCurryArgument, AvoidMethodReturnInNamedFunctions, ExampleDetector, LintTest, OneNewlineAtEndOfFile>;
+using DetectorList = TypeList<AvoidCurryArgument, AvoidMethodReturnInNamedFunctions, ExampleDetector, LintTest,
+                              OmitTrailingWhitespace, OneNewlineAtEndOfFile>;
 
 } // namespace lint
 
