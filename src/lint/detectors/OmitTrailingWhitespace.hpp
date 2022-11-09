@@ -35,12 +35,16 @@ public:
                 rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
                 // Calling m_rewriter->Delete() here inexplicably hangs the program on Windows.
-//                m_rewriter->replace(token->getTokenIndex(), "");
                 m_toDelete.insert(token->getTokenIndex());
                 m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
                                      kOptionName, "removing whitespace at end of line." });
             }
         }
+    }
+
+    void exitRoot(sprklr::SCParser::RootContext*) override {
+        for (auto index : m_toDelete)
+            m_rewriter->replace(index, "");
     }
 
 private:
