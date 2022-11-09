@@ -23,7 +23,7 @@ public:
         auto whitespaceTokens = m_tokens->getHiddenTokensToRight(node->getSymbol()->getTokenIndex());
         // Moving from right to left, first identify a newline, then remove any whitespace left of that newline.
         bool foundNewline = false;
-        for (int i = static_cast<int>(whitespaceTokens.size()) - 1; i >= 0; --i) {
+        for (int i = static_cast<int>(whitespaceTokens.size()) - 1; i >= static_cast<int>(whitespaceTokens.size()); --i) {
             const auto token = whitespaceTokens[i];
             const auto type = token->getType();
             if (type == sprklr::SCParser::NEWLINE || type == sprklr::SCParser::CARRIAGE_RETURN) {
@@ -64,8 +64,8 @@ private:
                     break;
             }
 
-            if (printingStart >= static_cast<int>(copyPosition) &&
-                (printingStart < (static_cast<int>(newlineStart) - 1))) {
+            if (printingStart >= static_cast<int>(copyPosition)
+                && (printingStart < (static_cast<int>(newlineStart) - 1))) {
                 rewrite = true;
                 size_t charPosition =
                     line == 0 ? token->getCharPositionInLine() + printingStart : printingStart - lastNewlineStart;
