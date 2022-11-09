@@ -33,9 +33,9 @@ public:
                 foundNewline = false;
                 rewriteComment(token);
             } else if (foundNewline && (type == sprklr::SCParser::TAB || type == sprklr::SCParser::SPACE)) {
-//                m_rewriter->Delete(token->getTokenIndex());
-                m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
-                                     kOptionName, "removing whitespace at end of line." });
+                m_rewriter->Delete(token->getTokenIndex());
+//                m_linter->addIssue({ IssueSeverity::kLint, token->getLine(), token->getCharPositionInLine(),
+//                                     kOptionName, "removing whitespace at end of line." });
             }
         }
     }
