@@ -38,7 +38,7 @@ public:
                 continue;
             }
 
-            if (type == sprklr::SCParser::COMMENT_LINE || type == sprklr::SCParser::COMMENT_BLOCK) {
+            if (type == sprklr::SCParser::COMMENT_LINE /* || type == sprklr::SCParser::COMMENT_BLOCK */) {
                 // Reset the newline flag as we found some printing characters on this line.
                 foundNewline = false;
                 rewriteComment(token);
@@ -62,7 +62,7 @@ private:
         // We assume that a valid block or line comment could never start with a newline.
         assert(newlineStart == std::string::npos || newlineStart > 0);
 
-        while (newlineStart != std::string::npos && newlineStart < commentString.size()) {
+        while (newlineStart != std::string::npos) {
             // Search left of the newline for any whitespace.
             int printingStart = static_cast<int>(newlineStart) - 1;
             for (; printingStart >= static_cast<int>(copyPosition); --printingStart) {
@@ -72,7 +72,6 @@ private:
 
             if (printingStart >= static_cast<int>(copyPosition) &&
                 (printingStart < (static_cast<int>(newlineStart) - 1))) {
-/*
                 rewrite = true;
                 size_t charPosition =
                     line == 0 ? token->getCharPositionInLine() + printingStart : printingStart - lastNewlineStart;
@@ -80,7 +79,6 @@ private:
                 m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line, charPosition, kOptionName,
                                      "removing whitespace at end of line within comment." });
                 copyPosition = newlineStart;
-                */
             }
 
             // Increment line counter
