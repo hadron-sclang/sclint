@@ -38,7 +38,7 @@ public:
                 continue;
             }
 
-            if (type == sprklr::SCParser::COMMENT_LINE /* || type == sprklr::SCParser::COMMENT_BLOCK */) {
+            if (/*type == sprklr::SCParser::COMMENT_LINE || */ type == sprklr::SCParser::COMMENT_BLOCK) {
                 // Reset the newline flag as we found some printing characters on this line.
                 foundNewline = false;
                 rewriteComment(token);
