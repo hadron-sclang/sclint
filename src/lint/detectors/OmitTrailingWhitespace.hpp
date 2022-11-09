@@ -38,7 +38,7 @@ public:
                 continue;
             }
 
-            if (type == sprklr::SCParser::COMMENT_LINE /* || type == sprklr::SCParser::COMMENT_BLOCK */) {
+            if (type == sprklr::SCParser::COMMENT_LINE || type == sprklr::SCParser::COMMENT_BLOCK) {
                 // Reset the newline flag as we found some printing characters on this line.
                 foundNewline = false;
                 rewriteComment(token);
@@ -93,6 +93,8 @@ private:
                 newlineStart = commentString.find_first_of('\r', newlineStart + 1);
             else
                 newlineStart = commentString.find_first_of('\n', newlineStart + 1);
+
+            assert(newlineStart == std::string::npos || newlineStart > lastNewlineStart);
         }
 
         if (rewrite) {
