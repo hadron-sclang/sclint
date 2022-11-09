@@ -44,7 +44,7 @@ public:
 
     void exitRoot(sprklr::SCParser::RootContext*) override {
         for (auto index : m_toDelete)
-            m_rewriter->replace(index, "");
+            m_rewriter->replace(index, "BLAT");
     }
 
 private:
