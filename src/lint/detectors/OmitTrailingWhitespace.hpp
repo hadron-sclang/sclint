@@ -59,10 +59,10 @@ private:
 
         // There are zero or more newlines inside a block comment, and exactly one newline in a line comment.
         auto newlineStart = commentString.find_first_of("\r\n");
-        while (newlineStart != std::string::npos) {
-            // We assume that a valid block or line comment could never start with a newline.
-            assert(newlineStart > 0);
+        // We assume that a valid block or line comment could never start with a newline.
+        assert(newlineStart == std::string::npos || newlineStart > 0);
 
+        while (newlineStart != std::string::npos && newlineStart < commentString.size()) {
             // Search left of the newline for any whitespace.
             int printingStart = static_cast<int>(newlineStart) - 1;
             for (; printingStart >= static_cast<int>(copyPosition); --printingStart) {
@@ -72,6 +72,7 @@ private:
 
             if (printingStart >= static_cast<int>(copyPosition) &&
                 (printingStart < (static_cast<int>(newlineStart) - 1))) {
+/*
                 rewrite = true;
                 size_t charPosition =
                     line == 0 ? token->getCharPositionInLine() + printingStart : printingStart - lastNewlineStart;
@@ -79,6 +80,7 @@ private:
                 m_linter->addIssue({ IssueSeverity::kLint, token->getLine() + line, charPosition, kOptionName,
                                      "removing whitespace at end of line within comment." });
                 copyPosition = newlineStart;
+                */
             }
 
             // Increment line counter
@@ -93,8 +95,6 @@ private:
                 newlineStart = commentString.find_first_of('\r', newlineStart + 1);
             else
                 newlineStart = commentString.find_first_of('\n', newlineStart + 1);
-
-            assert(newlineStart == std::string::npos || newlineStart > lastNewlineStart);
         }
 
         if (rewrite) {
